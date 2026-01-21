@@ -91,7 +91,7 @@ def api_info():
 # =====================
 
 
-@app.route('/api/bots')
+@app.route('/api/bots', methods=['GET'])
 def api_bots():
     """Get bot information and configurations."""
     if not bots:
