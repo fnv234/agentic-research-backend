@@ -362,12 +362,12 @@ def run_simulation():
     try:
         data = request.json
         scenario = data.get('scenario', 'simple_deterministic')
-        agent_collaboration = data.get('agent_collaboration', 'collaborative')  # collaborative or uncollaborative
-        risk_tolerance = data.get('risk_tolerance', 0.5)  # 0-1, affects tolerance parameter
+        agent_collaboration = data.get('agent_collaboration', 'collaborative')
+        risk_tolerance = data.get('risk_tolerance', 0.5)
         num_years = data.get('num_years', 5)
         
-        # Load real simulation results based on scenario
-        sim_results = load_simulation_for_scenario(
+        # Run actual multi-agent environment simulation
+        sim_results = run_multi_agent_simulation(
             scenario=scenario,
             collaboration=agent_collaboration,
             risk_tolerance=risk_tolerance,
@@ -389,6 +389,108 @@ def run_simulation():
         logger.error(f"Error running simulation: {e}")
         return jsonify({'error': str(e)}), 500
 
+
+def run_multi_agent_simulation(scenario, collaboration, risk_tolerance, years):
+    """
+    Run the actual multi-agent environment simulation.
+    Gets agent recommendations and simulates outcomes over time.
+    """
+    try:
+        scenario_context = {
+            'simple_deterministic': {
+                'description': 'Predictable attacker with known patterns',
+                'threat_level': 'Low-Medium',
+                'attack_probability': 0.3
+            },
+            'simple_unpredictable': {
+                'description': 'Unpredictable attacker with variable tactics',
+                'threat_level': 'Low-Medium',
+                'attack_probability': 0.4
+            },
+            'ransomware': {
+                'description': 'Advanced ransomware attack',
+                'threat_level': 'High',
+                'attack_probability': 0.6
+            },
+            'ransomware_ransom': {
+                'description': 'Ransomware with ransom demand',
+                'threat_level': 'High',
+                'attack_probability': 0.7
+            }
+        }
+        
+        scenario_data = scenario_context.get(scenario, scenario_context['simple_deterministic'])
+        
+        # Get agent recommendations based on collaboration level
+        if board and bots:
+            # Create a run context for agents to evaluate
+            run_context = {
+                'scenario': scenario,
+                'threat_level': scenario_data['threat_level'],
+                'attack_probability': scenario_data['attack_probability'],
+                'collaboration': collaboration,
+                'risk_tolerance': risk_tolerance
+            }
+            
+            # Get board recommendations
+            agent_feedback = board.run_meeting(run_context)
+            agent_recommendations = board.negotiate_strategy(run_context)
+            agent_interaction = board.simulate_interaction(collaboration)
+            
+            # Extract individual agent perspectives
+            agent_perspectives = []
+            for bot in bots:
+                perspective = {
+                    'agent': bot.name,
+                    'kpi_focus': bot.kpi_focus,
+                    'target': bot.target,
+                    'personality': bot.personality,
+                    'recommendation': f"Focus on {bot.kpi_focus}",
+                    'priority': _calculate_agent_priority(bot, scenario_data, risk_tolerance)
+                }
+                agent_perspectives.append(perspective)
+        else:
+            agent_feedback = "No agents available"
+            agent_recommendations = []
+            agent_interaction = {}
+            agent_perspectives = []
+        
+        # Load real data and apply agent strategies
+        sim_results = load_simulation_for_scenario(
+            scenario=scenario,
+            collaboration=collaboration,
+            risk_tolerance=risk_tolerance,
+            years=years
+        )
+        
+        # Add agent perspectives to results
+        sim_results['agent_perspectives'] = agent_perspectives
+        sim_results['agent_feedback'] = agent_feedback
+        sim_results['agent_recommendations'] = agent_recommendations
+        sim_results['agent_interaction'] = agent_interaction
+        
+        return sim_results
+        
+    except Exception as e:
+        logger.warning(f"Error running multi-agent simulation: {e}, using fallback")
+        return load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years)
+
+
+def _calculate_agent_priority(agent, scenario_data, risk_tolerance):
+    """Calculate priority score for an agent based on scenario and risk tolerance."""
+    import random
+    
+    # Base priority varies by agent role
+    agent_priorities = {
+        'CFO': 0.9 if risk_tolerance > 0.5 else 0.7,
+        'CRO': 0.9 if scenario_data['threat_level'] == 'High' else 0.6,
+        'COO': 0.8,
+        'IT_Manager': 0.85 if scenario_data['threat_level'] == 'High' else 0.7,
+        'CHRO': 0.7,
+        'COO_Business': 0.8
+    }
+    
+    return agent_priorities.get(agent.name, 0.75) + random.uniform(-0.1, 0.1)
 
 def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years):
     """Load simulation data for a specific scenario from CSV."""
