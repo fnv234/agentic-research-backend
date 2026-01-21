@@ -23,7 +23,7 @@ def init_mongodb():
             from pymongo import MongoClient
             
             mongo_uri = os.getenv(
-                "MONGODB_URI",
+                "MONGODB",
                 "mongodb://localhost:27017"
             )
             db_name = os.getenv("MONGODB_DB", "agentic_research")

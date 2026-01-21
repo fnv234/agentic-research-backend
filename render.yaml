@@ -25,6 +25,8 @@ services:
         value: mitcams
       - key: FORIO_PROJECT
         value: cyberriskmanagement-ransomeware-2023
+      - key: MONGO_DB
+        sync: false
     healthCheckPath: /health
     healthCheckStartPeriod: 10
     healthCheckInterval: 30
