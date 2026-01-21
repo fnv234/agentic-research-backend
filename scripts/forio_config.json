@@ -1,0 +1,47 @@
+{
+  "variables": {
+    "kpis": [
+      "accumulated_profit",
+      "compromised_systems",
+      "systems_availability"
+    ],
+    "budgets": [
+      "prevention_budget",
+      "detection_budget",
+      "response_budget",
+      "recovery_budget"
+    ],
+    "additional_outputs": [
+      "systems_at_risk",
+      "fraction_to_make_profits",
+      "impact_on_business"
+    ],
+    "additional": [
+      "Time",
+      "FINAL_TIME",
+      "INITIAL_TIME"
+    ]
+  },
+  "input_mapping": {
+    "F1": "prevention_budget",
+    "F2": "detection_budget",
+    "F3": "response_budget",
+    "F4": "recovery_budget"
+  },
+  "groups": [
+    "default"
+  ],
+  "model_name": null,
+  "extraction_settings": {
+    "max_runs": 100,
+    "saved_only": true,
+    "include_trashed": false
+  },
+  "notes": {
+    "variables": "List all Vensim model variables you want to extract",
+    "groups": "Add student group names to filter by specific groups",
+    "model_name": "Set to your Vensim model name if needed (e.g., 'CyberRisk.vmf')",
+    "inputs": "F1-F4 represent percentages of IT budget: F1=prevention, F2=detection, F3=response, F4=recovery",
+    "outputs": "Main outputs: compromised_systems, profits, accumulated_profit. Additional: systems_at_risk, fraction_to_make_profits, impact_on_business"
+  }
+}
