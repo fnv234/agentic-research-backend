@@ -366,13 +366,22 @@ def run_simulation():
         risk_tolerance = data.get('risk_tolerance', 0.5)
         num_years = data.get('num_years', 5)
         
-        # Run actual multi-agent environment simulation
-        sim_results = run_multi_agent_simulation(
+        # Get base simulation results
+        sim_results = load_simulation_for_scenario(
             scenario=scenario,
             collaboration=agent_collaboration,
             risk_tolerance=risk_tolerance,
             years=num_years
         )
+        
+        # Add agent perspectives
+        agent_perspectives = get_agent_perspectives(
+            scenario=scenario,
+            collaboration=agent_collaboration,
+            risk_tolerance=risk_tolerance
+        )
+        
+        sim_results['agent_perspectives'] = agent_perspectives
         
         return jsonify({
             'success': True,
@@ -388,6 +397,78 @@ def run_simulation():
     except Exception as e:
         logger.error(f"Error running simulation: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+def get_agent_perspectives(scenario, collaboration, risk_tolerance):
+    """Get perspectives from each agent based on scenario and parameters."""
+    
+    # Define agent personalities and their KPI focus
+    agent_configs = [
+        {
+            'agent': 'CFO',
+            'kpi_focus': 'Accumulated Profit',
+            'target': 'Maximize revenue, minimize security costs',
+            'personality': {'ambition': 0.9, 'risk_tolerance': 0.8},
+            'recommendation': 'Focus on cost-effective security measures to maximize profit margins'
+        },
+        {
+            'agent': 'CRO',
+            'kpi_focus': 'Risk Mitigation',
+            'target': 'Minimize systems at risk',
+            'personality': {'ambition': 0.6, 'risk_tolerance': 0.2},
+            'recommendation': 'Implement comprehensive security controls and threat detection'
+        },
+        {
+            'agent': 'COO',
+            'kpi_focus': 'Operational Continuity',
+            'target': 'Maintain systems availability',
+            'personality': {'ambition': 0.7, 'risk_tolerance': 0.4},
+            'recommendation': 'Ensure business continuity and rapid recovery capabilities'
+        },
+        {
+            'agent': 'IT_Manager',
+            'kpi_focus': 'Security & Recovery',
+            'target': 'Fast detection and response',
+            'personality': {'ambition': 0.8, 'risk_tolerance': 0.3},
+            'recommendation': 'Deploy advanced detection systems and incident response procedures'
+        },
+        {
+            'agent': 'CHRO',
+            'kpi_focus': 'Team Readiness',
+            'target': 'Prepared incident response team',
+            'personality': {'ambition': 0.6, 'risk_tolerance': 0.5},
+            'recommendation': 'Ensure team training and preparedness for security incidents'
+        },
+        {
+            'agent': 'COO_Business',
+            'kpi_focus': 'Business Resilience',
+            'target': 'Customer satisfaction and trust',
+            'personality': {'ambition': 0.75, 'risk_tolerance': 0.6},
+            'recommendation': 'Communicate transparently and maintain customer confidence'
+        }
+    ]
+    
+    # Adjust priorities based on collaboration and risk tolerance
+    for agent_config in agent_configs:
+        if collaboration == 'collaborative':
+            # In collaborative mode, all agents have higher priority
+            base_priority = 0.7 + (risk_tolerance * 0.2)
+        else:
+            # In uncollaborative mode, vary by agent personality
+            base_priority = agent_config['personality']['ambition'] * 0.8
+        
+        # Adjust based on scenario threat level
+        threat_adjustments = {
+            'simple_deterministic': 0.6,
+            'simple_unpredictable': 0.7,
+            'ransomware': 0.85,
+            'ransomware_ransom': 0.95
+        }
+        
+        scenario_adjustment = threat_adjustments.get(scenario, 0.7)
+        agent_config['priority'] = min(1.0, base_priority * scenario_adjustment)
+    
+    return agent_configs
 
 
 def run_multi_agent_simulation(scenario, collaboration, risk_tolerance, years):
