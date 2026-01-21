@@ -15,7 +15,7 @@ services:
       - key: FLASK_ENV
         value: production
       - key: CORS_ORIGINS
-        value: https://yourdomain.com
+        value: https://agentic-research-frontend.onrender.com,http://localhost:3000,http://localhost:5173
         sync: false
       - key: PUBLIC_KEY
         sync: false
