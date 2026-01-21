@@ -55,6 +55,17 @@ except Exception as e:
     board = None
     bots = []
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint - redirect to API info."""
+    return jsonify({
+        'message': 'Agentic Research Backend API',
+        'service': 'agentic-research-backend',
+        'status': 'online',
+        'docs': 'See /api/info for service information'
+    }), 200
+
+
 @app.route('/health', methods=['GET'])
 def health():
     """Health check endpoint for monitoring."""
