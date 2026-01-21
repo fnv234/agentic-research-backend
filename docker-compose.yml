@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - HOST=0.0.0.0
+      - PORT=5000
+      - DEBUG=false
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173
+      - PUBLIC_KEY=${PUBLIC_KEY}
+      - PRIVATE_KEY=${PRIVATE_KEY}
+      - FORIO_ORG=${FORIO_ORG}
+      - FORIO_PROJECT=${FORIO_PROJECT}
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - agentic-network
+
+  # Uncomment and configure once have a React frontend in Docker
+  # frontend:
+  #   build:
+  #     context: ../agentic-research-frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:5000
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - agentic-network
+
+networks:
+  agentic-network:
+    driver: bridge
