@@ -28,8 +28,8 @@ from data.data_loader import (
 app = Flask(__name__)
 
 CORS(app, resources={
-    r"/api/*": {
-        "origins": os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173").split(","),
+    r"/*": {
+        "origins": os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,https://agentic-research-frontend.onrender.com").split(","),
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type"]
     }
