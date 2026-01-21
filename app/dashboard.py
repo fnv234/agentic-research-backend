@@ -299,6 +299,124 @@ def api_statistics():
 
 
 # =====================
+# Simulation Scenarios
+# =====================
+
+@app.route('/api/scenarios', methods=['GET'])
+def get_scenarios():
+    """Get available simulation scenarios."""
+    scenarios = [
+        {
+            'id': 'simple_deterministic',
+            'name': 'Simple Cyber Threats - Deterministic Attacker',
+            'description': 'Facing simple cyber threats with a predictable attacker'
+        },
+        {
+            'id': 'simple_unpredictable',
+            'name': 'Simple Cyber Threats - Unpredictable Attacker',
+            'description': 'Facing simple cyber threats with an unpredictable attacker'
+        },
+        {
+            'id': 'ransomware',
+            'name': 'Advanced Ransomware Attack',
+            'description': 'Facing advanced cyber attacks (ransomware)'
+        },
+        {
+            'id': 'ransomware_ransom',
+            'name': 'Advanced Ransomware - With Ransom Payment',
+            'description': 'Facing advanced ransomware attacks with ransom payment option'
+        }
+    ]
+    return jsonify({
+        'success': True,
+        'scenarios': scenarios
+    }), 200
+
+
+@app.route('/api/simulate', methods=['POST'])
+def run_simulation():
+    """Run a multi-agent simulation with specified parameters."""
+    try:
+        data = request.json
+        scenario = data.get('scenario', 'simple_deterministic')
+        agent_collaboration = data.get('agent_collaboration', 'collaborative')  # collaborative or uncollaborative
+        risk_tolerance = data.get('risk_tolerance', 0.5)  # 0-1, affects tolerance parameter
+        num_years = data.get('num_years', 5)
+        
+        # Generate mock simulation results based on parameters
+        # In production, this would run actual simulations
+        mock_results = generate_mock_simulation_results(
+            scenario=scenario,
+            collaboration=agent_collaboration,
+            risk_tolerance=risk_tolerance,
+            years=num_years
+        )
+        
+        return jsonify({
+            'success': True,
+            'simulation_id': f"sim_{scenario}_{agent_collaboration}",
+            'parameters': {
+                'scenario': scenario,
+                'agent_collaboration': agent_collaboration,
+                'risk_tolerance': risk_tolerance,
+                'num_years': num_years
+            },
+            'results': mock_results
+        }), 200
+    except Exception as e:
+        logger.error(f"Error running simulation: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+def generate_mock_simulation_results(scenario, collaboration, risk_tolerance, years):
+    """Generate mock simulation results based on parameters."""
+    import random
+    
+    # Base values that vary by scenario
+    scenario_impact = {
+        'simple_deterministic': {'profit_variance': 0.1, 'risk_variance': 0.05},
+        'simple_unpredictable': {'profit_variance': 0.15, 'risk_variance': 0.1},
+        'ransomware': {'profit_variance': 0.25, 'risk_variance': 0.2},
+        'ransomware_ransom': {'profit_variance': 0.3, 'risk_variance': 0.25}
+    }
+    
+    impact = scenario_impact.get(scenario, scenario_impact['simple_deterministic'])
+    
+    # Collaborative agents perform better
+    collab_bonus = 1.2 if collaboration == 'collaborative' else 0.8
+    
+    # Risk tolerance affects results
+    profit_base = 1500000 * collab_bonus * (0.7 + risk_tolerance * 0.6)
+    risk_base = 20 * collab_bonus * (1.0 - risk_tolerance * 0.5)
+    
+    # Generate time-series data
+    time_series = []
+    for year in range(1, years + 1):
+        noise_profit = random.gauss(0, impact['profit_variance'] * profit_base)
+        noise_risk = random.gauss(0, impact['risk_variance'] * risk_base)
+        
+        time_series.append({
+            'year': year,
+            'accumulated_profit': max(0, profit_base + noise_profit),
+            'systems_at_risk': max(0, risk_base + noise_risk),
+            'compromised_systems': max(0, (risk_base + noise_risk) / 2),
+            'systems_availability': min(1.0, 0.95 - (risk_base + noise_risk) / 200)
+        })
+    
+    return {
+        'time_series': time_series,
+        'summary': {
+            'final_profit': time_series[-1]['accumulated_profit'],
+            'final_risk': time_series[-1]['systems_at_risk'],
+            'avg_availability': sum(t['systems_availability'] for t in time_series) / years,
+            'scenario': scenario,
+            'collaboration': collaboration,
+            'risk_tolerance': risk_tolerance
+        }
+    }
+
+
+# =====================
 # Error Handlers
 # =====================
 
