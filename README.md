@@ -2,17 +2,6 @@
 
 A production-ready Python backend service for multi-agent research systems with seamless React frontend integration.
 
-## Features
-
-- **Multi-Agent System**: CFO, CRO, and COO agents with distinct KPI focus
-- **Real-time Data Processing**: Load and compare real vs. simulated data
-- **Statistical Analysis**: Comprehensive metrics and comparisons
-- **RESTful API**: Clean, well-documented API for frontend integration
-- **Production Ready**: CORS support, error handling, health checks
-- **Docker Support**: Easy containerization and deployment
-- **Fast**: Optimized for performance with caching support
-- **Flexible**: Works with multiple data sources (CSV, JSON, mock data)
-
 ## Project Structure
 
 ```
