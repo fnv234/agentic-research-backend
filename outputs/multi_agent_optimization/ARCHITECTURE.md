@@ -40,16 +40,18 @@ This document describes the architecture and design of the multi-agent decision 
 
 #### 2.1 Agent Structure
 
-Each `ExecutiveBot` agent consists of three key components:
+The framework uses **five executive agents** (CFO, CRO, COO, IT_Manager, CHRO). Each `ExecutiveBot` agent consists of three key components:
 
 1. **KPI Focus**: The specific metric the agent monitors
-   - CFO: `accumulated_profit`
-   - CRO: `compromised_systems`
-   - COO: `systems_availability`
+   - **CFO**: `accumulated_profit` (minimize cost, maximize revenue)
+   - **CRO**: `compromised_systems` (minimize risk exposure)
+   - **COO**: `systems_availability` (maximize operational continuity)
+   - **IT_Manager**: `compromised_systems` (stricter cap than CRO; technical security focus)
+   - **CHRO**: `systems_availability` (higher floor than COO; readiness and continuity focus)
 
 2. **Target Threshold**: Acceptable performance boundaries
-   - Minimum thresholds (for maximize KPIs like profit)
-   - Maximum thresholds (for minimize KPIs like compromised systems)
+   - Minimum thresholds (for maximize KPIs: profit, availability)
+   - Maximum thresholds (for minimize KPIs: compromised systems)
 
 3. **Personality Traits**: Three-dimensional personality model
    - `risk_tolerance`: 0.0 (conservative) to 1.0 (aggressive)
@@ -106,25 +108,19 @@ Years 2-5:
 
 #### 3.2 Allocation Adjustment Logic
 
-The optimizer adjusts F1-F4 based on agent feedback:
+The optimizer adjusts F1-F4 based on **all five agents’** feedback (adjustments are cumulative when multiple agents trigger):
 
 - **CFO (Profit below target)**:
-  - Increase F1 (prevention) by +2%
-  - Increase F2 (detection) by +1%
-  - Decrease F3 (response) by -1.5%
-  - Decrease F4 (recovery) by -1.5%
+  - Increase F1 (prevention) by +2%, F2 (detection) by +1%
+  - Decrease F3 (response) by -1.5%, F4 (recovery) by -1.5%
 
-- **CRO (Compromised systems above target)**:
-  - Increase F1 (prevention) by +3%
-  - Increase F2 (detection) by +2%
-  - Decrease F3 (response) by -2%
-  - Decrease F4 (recovery) by -3%
+- **CRO / IT_Manager (Compromised systems above target)**:
+  - Both use the same KPI with different caps (CRO max 10, IT_Manager max 8).
+  - When either agent’s target is exceeded: Increase F1 by +3%, F2 by +2%; Decrease F3 by -2%, F4 by -3%.
 
-- **COO (Availability below target)**:
-  - Increase F1 (prevention) by +1.5%
-  - Increase F2 (detection) by +1%
-  - Decrease F3 (response) by -1%
-  - Decrease F4 (recovery) by -1.5%
+- **COO / CHRO (Availability below target)**:
+  - Both use the same KPI with different floors (COO min 0.92, CHRO min 0.93).
+  - When either agent’s target is missed: Increase F1 by +1.5%, F2 by +1%; Decrease F3 by -1%, F4 by -1.5%.
 
 #### 3.3 Constraints
 
@@ -229,34 +225,7 @@ Visualization & Analysis
 
 #### 7.1 Results JSON
 
-```json
-{
-  "scenario_name": {
-    "config_name": {
-      "metrics": {
-        "total_profit": ...,
-        "total_systems_at_risk": ...,
-        "average_compromised_systems": ...,
-        ...
-      },
-      "config": {
-        "collaborative": true/false,
-        "risk_tolerance": "low/medium/high"
-      },
-      "years_summary": [
-        {
-          "year": 1,
-          "profit": ...,
-          "compromised": ...,
-          "systems_at_risk": ...,
-          "F1": ..., "F2": ..., "F3": ..., "F4": ...
-        },
-        ...
-      ]
-    }
-  }
-}
-```
+See json files.
 
 #### 7.2 Visualizations
 
@@ -269,9 +238,9 @@ Visualization & Analysis
 
 #### 8.1 Why Multi-Agent?
 
-- Captures diverse stakeholder perspectives (CFO, CRO, COO)
-- Enables trade-off analysis between competing objectives
-- Provides realistic decision-making simulation
+- Captures diverse stakeholder perspectives (five agents: CFO, CRO, COO, IT_Manager, CHRO)
+- Enables trade-off analysis between competing objectives (profit, risk, continuity)
+- Provides realistic decision-making simulation aligned with board-level cyber risk governance
 
 #### 8.2 Why Personality-Driven?
 

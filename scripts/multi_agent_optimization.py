@@ -1,7 +1,7 @@
 """
 Multi-Agent Optimization for Cyber-Risk Management
 
-Scenarios:
+Scenarios (thus far):
 - Simple cyber threats with deterministic attacker
 - Simple cyber threats with unpredictable attacker
 - Advanced cyber attacks (ransomware)
@@ -216,11 +216,8 @@ class MultiAgentOptimizer:
         self.collaborative = collaborative
         self.risk_tolerance_level = risk_tolerance_level
         
-        # Adjust agent personalities based on configuration
+        # Use all agents from config (5 agents: CFO, CRO, COO, IT_Manager, CHRO)
         for name, config in agent_config.items():
-            if name in ['IT_Manager', 'CHRO', 'COO_Business']:
-                continue  # Focus on main 3 agents
-            
             personality = config['personality'].copy()
             
             # Adjust ambition based on collaborative setting
@@ -366,15 +363,15 @@ class MultiAgentOptimizer:
                 adjustments['F3'] -= 1.5
                 adjustments['F4'] -= 1.5
             
-            # CRO: If compromised systems above target, increase prevention
-            elif agent.name == "CRO" and kpi_value > target_max:
+            # CRO / IT_Manager: If compromised systems above target, increase prevention
+            elif agent.name in ("CRO", "IT_Manager") and kpi_value > target_max:
                 adjustments['F1'] += 3
                 adjustments['F2'] += 2
                 adjustments['F3'] -= 2
                 adjustments['F4'] -= 3
             
-            # COO: If availability below target, increase prevention/detection
-            elif agent.name == "COO" and kpi_value < target_min:
+            # COO / CHRO: If availability below target, increase prevention/detection
+            elif agent.name in ("COO", "CHRO") and kpi_value < target_min:
                 adjustments['F1'] += 1.5
                 adjustments['F2'] += 1
                 adjustments['F3'] -= 1
@@ -507,7 +504,7 @@ def run_comprehensive_analysis():
         'advanced_ransomware_paid': 'Advanced Attacks - Ransomware (With Payment)'
     }
     
-    # Define agent configurations
+    # Define agent configurations (4 configs for standard run)
     agent_configs = [
         ('collaborative', True, 'medium'),
         ('uncollaborative', False, 'medium'),
@@ -648,7 +645,7 @@ def generate_visualizations(all_results: Dict, output_dir: str):
     print(f"  ✅ Saved: {output_dir}/primary_results.png")
     plt.close()
     
-    # 2. Comparison across scenarios (collaborative vs uncollaborative)
+    # comparison across scenarios (collaborative vs uncollaborative)
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
     fig.suptitle('Agent Configuration Comparison: Collaborative vs Uncollaborative', 
                  fontsize=14, fontweight='bold')
@@ -692,7 +689,7 @@ def generate_visualizations(all_results: Dict, output_dir: str):
     print(f"  ✅ Saved: {output_dir}/collaborative_comparison.png")
     plt.close()
     
-    # 3. Risk tolerance comparison
+    # risk tolerance comparison
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     fig.suptitle('Risk Tolerance Comparison Across Scenarios', 
                  fontsize=14, fontweight='bold')
@@ -739,55 +736,157 @@ def generate_visualizations(all_results: Dict, output_dir: str):
     print(f"  ✅ Saved: {output_dir}/risk_tolerance_comparison.png")
     plt.close()
     
-    # 4. Year-by-year evolution for one scenario (example)
-    if scenarios:
-        example_scenario = scenarios[0]
-        if example_scenario in all_results:
-            fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-            fig.suptitle(f'5-Year Evolution: {example_scenario.replace("_", " ").title()}', 
-                        fontsize=14, fontweight='bold')
-            
-            configs_to_plot = ['collaborative', 'uncollaborative', 'low_risk_tolerance', 'high_risk_tolerance']
-            
-            for idx, config_key in enumerate(configs_to_plot):
-                if config_key not in all_results[example_scenario]:
-                    continue
-                
-                ax = axes[idx // 2, idx % 2]
-                years_data = all_results[example_scenario][config_key]['years']
-                
-                years = [y['year'] for y in years_data]
-                profits = [y.get('accumulated_profit', 0) / 1000000 for y in years_data]
-                systems_at_risk = [y.get('systems_at_risk', 0) for y in years_data]
-                
-                ax2 = ax.twinx()
-                line1 = ax.plot(years, profits, 'o-', color='green', linewidth=2, 
-                               label='Profit (M$)', markersize=8)
-                line2 = ax2.plot(years, systems_at_risk, 's-', color='red', linewidth=2, 
-                                label='Systems at Risk', markersize=8)
-                
-                ax.set_xlabel('Year', fontweight='bold')
-                ax.set_ylabel('Profit (Millions $)', fontweight='bold', color='green')
-                ax2.set_ylabel('Systems at Risk', fontweight='bold', color='red')
-                ax.set_title(config_key.replace('_', ' ').title(), fontweight='bold')
-                ax.tick_params(axis='y', labelcolor='green')
-                ax2.tick_params(axis='y', labelcolor='red')
-                ax.grid(True, alpha=0.3)
-                
-                lines = line1 + line2
-                labels = [l.get_label() for l in lines]
-                ax.legend(lines, labels, loc='best')
-            
-            plt.tight_layout()
-            plt.savefig(f'{output_dir}/year_by_year_evolution.png', dpi=300, bbox_inches='tight')
-            print(f"  ✅ Saved: {output_dir}/year_by_year_evolution.png")
-            plt.close()
+    # year-by-year evolution for ALL scenarios (one figure per scenario)
+    configs_to_plot = ['collaborative', 'uncollaborative', 'low_risk_tolerance', 'high_risk_tolerance']
+    for scenario in scenarios:
+        if scenario not in all_results:
+            continue
+        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+        fig.suptitle(f'5-Year Evolution: {scenario.replace("_", " ").title()}', 
+                    fontsize=14, fontweight='bold')
+        for idx, config_key in enumerate(configs_to_plot):
+            if config_key not in all_results[scenario]:
+                continue
+            ax = axes[idx // 2, idx % 2]
+            years_data = all_results[scenario][config_key]['years']
+            years = [y['year'] for y in years_data]
+            profits = [y.get('accumulated_profit', 0) / 1000000 for y in years_data]
+            systems_at_risk = [y.get('systems_at_risk', 0) for y in years_data]
+            ax2 = ax.twinx()
+            line1 = ax.plot(years, profits, 'o-', color='green', linewidth=2, 
+                           label='Profit (M$)', markersize=8)
+            line2 = ax2.plot(years, systems_at_risk, 's-', color='red', linewidth=2, 
+                            label='Systems at Risk', markersize=8)
+            ax.set_xlabel('Year', fontweight='bold')
+            ax.set_ylabel('Profit (Millions $)', fontweight='bold', color='green')
+            ax2.set_ylabel('Systems at Risk', fontweight='bold', color='red')
+            ax.set_title(config_key.replace('_', ' ').title(), fontweight='bold')
+            ax.tick_params(axis='y', labelcolor='green')
+            ax2.tick_params(axis='y', labelcolor='red')
+            ax.grid(True, alpha=0.3)
+            lines = line1 + line2
+            labels = [l.get_label() for l in lines]
+            ax.legend(lines, labels, loc='best')
+        plt.tight_layout()
+        safe_name = scenario.replace(' ', '_')
+        plt.savefig(f'{output_dir}/year_by_year_evolution_{safe_name}.png', dpi=300, bbox_inches='tight')
+        print(f"  ✅ Saved: {output_dir}/year_by_year_evolution_{safe_name}.png")
+        plt.close()
+    # legacy single file for first scenario (backward compatibility)
+    if scenarios and scenarios[0] in all_results:
+        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+        fig.suptitle(f'5-Year Evolution: {scenarios[0].replace("_", " ").title()}', fontsize=14, fontweight='bold')
+        for idx, config_key in enumerate(configs_to_plot):
+            if config_key not in all_results[scenarios[0]]:
+                continue
+            ax = axes[idx // 2, idx % 2]
+            years_data = all_results[scenarios[0]][config_key]['years']
+            years = [y['year'] for y in years_data]
+            profits = [y.get('accumulated_profit', 0) / 1000000 for y in years_data]
+            systems_at_risk = [y.get('systems_at_risk', 0) for y in years_data]
+            ax2 = ax.twinx()
+            ax.plot(years, profits, 'o-', color='green', linewidth=2, label='Profit (M$)', markersize=8)
+            ax2.plot(years, systems_at_risk, 's-', color='red', linewidth=2, label='Systems at Risk', markersize=8)
+            ax.set_xlabel('Year'); ax.set_ylabel('Profit (M$)', color='green'); ax2.set_ylabel('Systems at Risk', color='red')
+            ax.set_title(config_key.replace('_', ' ').title()); ax.tick_params(axis='y', labelcolor='green'); ax2.tick_params(axis='y', labelcolor='red')
+            ax.grid(True, alpha=0.3); ax.legend(loc='best')
+        plt.tight_layout()
+        plt.savefig(f'{output_dir}/year_by_year_evolution.png', dpi=300, bbox_inches='tight')
+        print(f"Saved: {output_dir}/year_by_year_evolution.png")
+        plt.close()
     
-    print("\n✅ All visualizations generated!")
+    print("\nAll visualizations generated!")
+
+
+def run_paper_matrix_analysis():
+    """
+    Run full 6 scenarios × 6 configurations matrix for paper.
+    Scenarios: deterministic simple, random simple, deterministic ransomware,
+               random ransomware, deterministic ransomware+pay, random ransomware+pay.
+    Configs: collaborative (high/avg/low risk) + uncollaborative (high/avg/low risk).
+    """
+    print("=" * 80)
+    print("PAPER MATRIX: 6 Scenarios × 6 Configurations (5-Year)")
+    print("=" * 80)
+    
+    loader = SimulationDataLoader('data/sim_data.csv')
+    
+    # 6 scenarios for paper: (scenario_key, data_scenario_for_loader, add_noise_for_random)
+    scenarios_paper = [
+        ('simple_deterministic', 'simple_deterministic', False),
+        ('simple_unpredictable', 'simple_unpredictable', False),
+        ('ransomware_deterministic', 'advanced_ransomware', False),
+        ('ransomware_random', 'advanced_ransomware', True),
+        ('ransomware_pay_deterministic', 'advanced_ransomware_paid', False),
+        ('ransomware_pay_random', 'advanced_ransomware_paid', True),
+    ]
+    
+    # 6 configurations: (config_name, collaborative, risk_tolerance)
+    configs = [
+        ('collaborative_high', True, 'high'),
+        ('collaborative_medium', True, 'medium'),
+        ('collaborative_low', True, 'low'),
+        ('uncollaborative_high', False, 'high'),
+        ('uncollaborative_medium', False, 'medium'),
+        ('uncollaborative_low', False, 'low'),
+    ]
+    
+    all_results = {}
+    for scenario_name, data_scenario, use_noise in scenarios_paper:
+        try:
+            scenario_data = loader.get_scenario_data(data_scenario)
+        except ValueError:
+            scenario_data = loader.get_scenario_data('simple_deterministic')
+        
+        if use_noise and len(scenario_data) > 0:
+            scenario_data = scenario_data.copy()
+            np.random.seed(42)
+            if 'Cum. Profits' in scenario_data.columns:
+                scenario_data['Cum. Profits'] = scenario_data['Cum. Profits'] * (1 + np.random.normal(0, 0.15, len(scenario_data)))
+            if 'Comp. Systems' in scenario_data.columns:
+                scenario_data['Comp. Systems'] = (scenario_data['Comp. Systems'] + np.random.randint(-5, 5, len(scenario_data))).clip(lower=0)
+        
+        if len(scenario_data) == 0:
+            print(f"  Skip {scenario_name}: no data")
+            continue
+        
+        print(f"  Scenario: {scenario_name} ({len(scenario_data)} runs)")
+        all_results[scenario_name] = {}
+        for config_name, collaborative, risk_tolerance in configs:
+            optimizer = MultiAgentOptimizer(collaborative=collaborative, risk_tolerance_level=risk_tolerance)
+            years = optimizer.run_5_year_optimization(scenario_data)
+            metrics = optimizer.calculate_5_year_metrics(years)
+            all_results[scenario_name][config_name] = {
+                'years': years,
+                'metrics': metrics,
+                'config': {'collaborative': collaborative, 'risk_tolerance': risk_tolerance}
+            }
+    
+    output_dir = 'outputs/multi_agent_optimization'
+    os.makedirs(output_dir, exist_ok=True)
+    results_json = {}
+    for scenario, scenario_res in all_results.items():
+        results_json[scenario] = {}
+        for config, config_res in scenario_res.items():
+            results_json[scenario][config] = {
+                'metrics': config_res['metrics'],
+                'config': config_res['config'],
+                'years_summary': [{'year': y['year'], 'profit': y.get('accumulated_profit', 0), 'compromised': y.get('compromised_systems', 0),
+                                  'systems_at_risk': y.get('systems_at_risk', 0), 'F1': y.get('F1', 0), 'F2': y.get('F2', 0), 'F3': y.get('F3', 0), 'F4': y.get('F4', 0)}
+                for y in config_res['years']]
+            }
+    with open(f'{output_dir}/paper_matrix_results.json', 'w') as f:
+        json.dump(results_json, f, indent=2, default=str)
+    print(f"\nSaved {output_dir}/paper_matrix_results.json")
+    return all_results
 
 
 def main():
     """Main execution function."""
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == '--paper-matrix':
+        run_paper_matrix_analysis()
+        return
     results = run_comprehensive_analysis()
     
     print("\n" + "=" * 80)

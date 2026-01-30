@@ -57,7 +57,7 @@ def save_data(data):
     """Save data to JSON file."""
     with open('simulation_data.json', 'w') as f:
         json.dump(data, f, indent=2)
-    print(f"\n✅ Data saved to simulation_data.json")
+    print(f"\nData saved to simulation_data.json")
 
 def enter_data_for_run(run):
     """Interactive data entry for a single run."""
@@ -74,14 +74,14 @@ def enter_data_for_run(run):
     data = {}
     
     # Settings (from facilitator interface)
-    print("\n📋 Simulation Settings:")
+    print("\nSimulation Settings:")
     data['simulation_level'] = input("  Simulation level (1 or 2): ").strip() or "1"
     data['attack_type'] = input("  Attack type (other/ransomware): ").strip() or "other"
     data['ransom_policy'] = input("  Ransom policy (pay/not_pay): ").strip() or "not_pay"
     data['run_limit'] = input("  Run limit (1-10 or unlimited): ").strip() or "unlimited"
     
     # Budget allocation (F1-F4 as percentages of IT budget)
-    print("\n💰 Budget Allocation (F1-F4 as % of IT budget):")
+    print("\nBudget Allocation (F1-F4 as % of IT budget):")
     print("  F1 = Prevention, F2 = Detection, F3 = Response, F4 = Recovery")
     data['F1'] = float(input("  F1 - Prevention budget (%): ") or "0")
     data['F2'] = float(input("  F2 - Detection budget (%): ") or "0")
@@ -94,20 +94,20 @@ def enter_data_for_run(run):
     data['recovery_budget'] = data['F4']
     
     # Results/Outcomes - Main outputs
-    print("\n📊 Simulation Results - Main Outputs:")
+    print("\nSimulation Results - Main Outputs:")
     data['accumulated_profit'] = float(input("  Accumulated profit ($): ") or "0")
     data['compromised_systems'] = int(input("  Compromised systems: ") or "0")
     data['profits'] = float(input("  Profits ($): ") or "0")
     data['systems_availability'] = float(input("  Systems availability (0-1): ") or "1.0")
     
     # Additional outputs
-    print("\n📊 Simulation Results - Additional Outputs:")
+    print("\nSimulation Results - Additional Outputs:")
     data['systems_at_risk'] = float(input("  Systems at risk: ") or "0")
     data['fraction_to_make_profits'] = float(input("  Fraction to make profits (0-1): ") or "0")
     data['impact_on_business'] = float(input("  Impact on business (business disturbance): ") or "0")
     
     # Optional attack metrics
-    print("\n📊 Optional Attack Metrics:")
+    print("\nOptional Attack Metrics:")
     data['total_attacks'] = int(input("  Total attacks (or press Enter to skip): ") or "0") or None
     data['successful_attacks'] = int(input("  Successful attacks (or press Enter to skip): ") or "0") or None
     
@@ -122,22 +122,22 @@ def enter_data_for_run(run):
 
 def main():
     print("=" * 70)
-    print("🎯 Manual Data Entry for Forio Simulation Runs")
+    print("Manual Data Entry for Forio Simulation Runs")
     print("=" * 70)
     
     # Fetch runs from Forio
-    print("\n📡 Fetching runs from Forio...")
+    print("\nFetching runs from Forio...")
     runs = fetch_runs(10)
     
     if not runs:
-        print("❌ No runs found. Check your Forio connection.")
+        print("No runs found. Check your Forio connection.")
         return
     
-    print(f"✅ Found {len(runs)} runs")
+    print(f"Found {len(runs)} runs")
     
     # Load existing data
     existing_data = load_existing_data()
-    print(f"📂 Loaded {len(existing_data)} previously entered runs")
+    print(f"Loaded {len(existing_data)} previously entered runs")
     
     # Show runs and let user choose
     print(f"\n{'='*70}")
@@ -155,7 +155,7 @@ def main():
     choice = input("\nEnter run number to add/edit data (or 'q' to quit): ").strip()
     
     if choice.lower() == 'q':
-        print("👋 Goodbye!")
+        print("Goodbye!")
         return
     
     try:
@@ -166,9 +166,9 @@ def main():
             
             # Check if data already exists
             if run_id in existing_data:
-                print(f"\n⚠️  Data already exists for this run:")
+                print(f"Data already exists for this run:")
                 print(json.dumps(existing_data[run_id], indent=2))
-                overwrite = input("\nOverwrite? (y/n): ").strip().lower()
+                overwrite = input("Overwrite? (y/n): ").strip().lower()
                 if overwrite != 'y':
                     print("Cancelled.")
                     return
@@ -182,7 +182,7 @@ def main():
             print(f"{'='*70}")
             print(json.dumps(data, indent=2))
             
-            confirm = input("\nSave this data? (y/n): ").strip().lower()
+            confirm = input("Save this data? (y/n): ").strip().lower()
             if confirm == 'y':
                 existing_data[run_id] = data
                 save_data(existing_data)
@@ -192,22 +192,22 @@ def main():
                     from data.forio_data_api import ForioDataAPI
                     data_api = ForioDataAPI()
                     if data_api.is_configured():
-                        save_to_api = input("\nAlso save to Forio Data API? (y/n): ").strip().lower()
+                        save_to_api = input("Also save to Forio Data API? (y/n): ").strip().lower()
                         if save_to_api == 'y':
                             # Use run_id as document ID for consistency
                             saved = data_api.save_simulation_result(data, document_id=run_id)
                             if saved:
-                                print("✅ Also saved to Forio Data API")
+                                print("Also saved to Forio Data API")
                 except ImportError:
                     pass
                 except Exception as e:
-                    print(f"⚠️  Could not save to Data API: {e}")
+                    print(f"Could not save to Data API: {e}")
                 
-                print("\n✅ Data saved successfully!")
+                print("\nData saved successfully!")
                 print("\nYou can now use this data in the dashboard.")
                 print("Run: python dashboard.py")
             else:
-                print("❌ Data not saved.")
+                print("Data not saved.")
         else:
             print("Invalid run number.")
     except ValueError:

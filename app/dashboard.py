@@ -130,11 +130,9 @@ def api_runs():
     try:
         manual = load_manual_data()
         
-        # If no manual data, generate mock data
         if not manual:
             manual = generate_mock_data(20)
         
-        # Format for the API
         formatted_runs = []
         for run in manual:
             formatted_runs.append({
@@ -167,7 +165,6 @@ def api_real_data():
         if not real_runs:
             return jsonify({'success': False, 'count': 0, 'data': []}), 200
         
-        # Format for the API
         formatted_runs = []
         for run in real_runs:
             formatted_runs.append({
@@ -204,7 +201,6 @@ def api_evaluate():
         if not board:
             return jsonify({'error': 'Agents not initialized'}), 500
         
-        # Get bot evaluations
         feedback = board.run_meeting(run_data)
         recommendations = board.negotiate_strategy(run_data)
         interaction = board.simulate_interaction('collaborative')
@@ -224,7 +220,6 @@ def api_evaluate():
 def api_compare_real():
     """Compare real data against bot data."""
     try:
-        # Load real and bot data
         real_runs = load_csv_data()
         bot_runs = load_manual_data()
         
@@ -234,7 +229,6 @@ def api_compare_real():
         if not real_runs:
             return jsonify({'success': False, 'message': 'No real data available'}), 200
         
-        # Find best performers in each dataset
         best_real_profit = max(real_runs, key=lambda r: r.get('accumulated_profit', 0))
         best_real_security = min(real_runs, key=lambda r: r.get('compromised_systems', float('inf')))
         best_real_availability = max(real_runs, key=lambda r: r.get('systems_availability', 0))
@@ -243,11 +237,9 @@ def api_compare_real():
         best_bot_security = min(bot_runs, key=lambda r: r.get('compromised_systems', float('inf')))
         best_bot_availability = max(bot_runs, key=lambda r: r.get('systems_availability', 0))
         
-        # Calculate averages
         real_avg = _calculate_average_run(real_runs)
         bot_avg = _calculate_average_run(bot_runs)
         
-        # Get detailed comparison
         detailed_comparison = compare_runs(real_runs, bot_runs)
         
         return jsonify({
@@ -366,7 +358,6 @@ def run_simulation():
         risk_tolerance = data.get('risk_tolerance', 0.5)
         num_years = data.get('num_years', 5)
         
-        # Get base simulation results
         sim_results = load_simulation_for_scenario(
             scenario=scenario,
             collaboration=agent_collaboration,
@@ -374,7 +365,6 @@ def run_simulation():
             years=num_years
         )
         
-        # Add agent perspectives
         agent_perspectives = get_agent_perspectives(
             scenario=scenario,
             collaboration=agent_collaboration,
@@ -402,7 +392,6 @@ def run_simulation():
 def get_agent_perspectives(scenario, collaboration, risk_tolerance):
     """Get perspectives from each agent based on scenario and parameters."""
     
-    # Define agent personalities and their KPI focus
     agent_configs = [
         {
             'agent': 'CFO',
@@ -448,16 +437,12 @@ def get_agent_perspectives(scenario, collaboration, risk_tolerance):
         }
     ]
     
-    # Adjust priorities based on collaboration and risk tolerance
     for agent_config in agent_configs:
         if collaboration == 'collaborative':
-            # In collaborative mode, all agents have higher priority
             base_priority = 0.7 + (risk_tolerance * 0.2)
         else:
-            # In uncollaborative mode, vary by agent personality
             base_priority = agent_config['personality']['ambition'] * 0.8
         
-        # Adjust based on scenario threat level
         threat_adjustments = {
             'simple_deterministic': 0.6,
             'simple_unpredictable': 0.7,
@@ -502,9 +487,7 @@ def run_multi_agent_simulation(scenario, collaboration, risk_tolerance, years):
         
         scenario_data = scenario_context.get(scenario, scenario_context['simple_deterministic'])
         
-        # Get agent recommendations based on collaboration level
         if board and bots:
-            # Create a run context for agents to evaluate
             run_context = {
                 'scenario': scenario,
                 'threat_level': scenario_data['threat_level'],
@@ -513,12 +496,10 @@ def run_multi_agent_simulation(scenario, collaboration, risk_tolerance, years):
                 'risk_tolerance': risk_tolerance
             }
             
-            # Get board recommendations
             agent_feedback = board.run_meeting(run_context)
             agent_recommendations = board.negotiate_strategy(run_context)
             agent_interaction = board.simulate_interaction(collaboration)
             
-            # Extract individual agent perspectives
             agent_perspectives = []
             for bot in bots:
                 perspective = {
@@ -536,7 +517,6 @@ def run_multi_agent_simulation(scenario, collaboration, risk_tolerance, years):
             agent_interaction = {}
             agent_perspectives = []
         
-        # Load real data and apply agent strategies
         sim_results = load_simulation_for_scenario(
             scenario=scenario,
             collaboration=collaboration,
@@ -544,7 +524,6 @@ def run_multi_agent_simulation(scenario, collaboration, risk_tolerance, years):
             years=years
         )
         
-        # Add agent perspectives to results
         sim_results['agent_perspectives'] = agent_perspectives
         sim_results['agent_feedback'] = agent_feedback
         sim_results['agent_recommendations'] = agent_recommendations
@@ -561,7 +540,6 @@ def _calculate_agent_priority(agent, scenario_data, risk_tolerance):
     """Calculate priority score for an agent based on scenario and risk tolerance."""
     import random
     
-    # Base priority varies by agent role
     agent_priorities = {
         'CFO': 0.9 if risk_tolerance > 0.5 else 0.7,
         'CRO': 0.9 if scenario_data['threat_level'] == 'High' else 0.6,
@@ -582,7 +560,6 @@ def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years)
     try:
         df = pd.read_csv(csv_path)
         
-        # Clean data
         if 'Cum. Profits' in df.columns:
             df['Cum. Profits'] = pd.to_numeric(df['Cum. Profits'].astype(str).str.replace(',', ''), errors='coerce')
         
@@ -591,7 +568,6 @@ def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years)
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors='coerce')
         
-        # Map scenario to CSV filters
         scenario_filters = {
             'simple_deterministic': {'Level': 1, 'Ransomware': 0},
             'simple_unpredictable': {'Level': 1, 'Ransomware': 0},
@@ -606,26 +582,19 @@ def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years)
                 filtered = filtered[filtered[col] == val]
         
         if len(filtered) == 0:
-            # Fallback to mock data if no matching scenario
             return generate_mock_simulation_results(scenario, collaboration, risk_tolerance, years)
         
-        # Select a representative sample based on collaboration and risk tolerance
         if collaboration == 'collaborative':
-            # High profit, low risk profiles
             filtered = filtered.nlargest(10, 'Cum. Profits')
         else:
-            # More varied outcomes
             filtered = filtered.sample(min(10, len(filtered)))
         
-        # Take average of selected runs
         avg_profit = filtered['Cum. Profits'].mean() if len(filtered) > 0 else 1500000
         avg_risk = filtered['Comp. Systems'].mean() if len(filtered) > 0 else 15
         
-        # Apply risk tolerance modifier
         avg_profit = avg_profit * (0.7 + risk_tolerance * 0.6)
         avg_risk = avg_risk * (1.0 - risk_tolerance * 0.3)
         
-        # Generate time series
         time_series = []
         for year in range(1, years + 1):
             profit_at_year = avg_profit * (year / years) * (0.8 + (year / years) * 0.4)
@@ -658,7 +627,6 @@ def generate_mock_simulation_results(scenario, collaboration, risk_tolerance, ye
     """Generate mock simulation results based on parameters."""
     import random
     
-    # Base values that vary by scenario
     scenario_impact = {
         'simple_deterministic': {'profit_variance': 0.1, 'risk_variance': 0.05},
         'simple_unpredictable': {'profit_variance': 0.15, 'risk_variance': 0.1},
@@ -668,14 +636,11 @@ def generate_mock_simulation_results(scenario, collaboration, risk_tolerance, ye
     
     impact = scenario_impact.get(scenario, scenario_impact['simple_deterministic'])
     
-    # Collaborative agents perform better
     collab_bonus = 1.2 if collaboration == 'collaborative' else 0.8
     
-    # Risk tolerance affects results
     profit_base = 1500000 * collab_bonus * (0.7 + risk_tolerance * 0.6)
     risk_base = 20 * collab_bonus * (1.0 - risk_tolerance * 0.5)
     
-    # Generate time-series data
     time_series = []
     for year in range(1, years + 1):
         noise_profit = random.gauss(0, impact['profit_variance'] * profit_base)
@@ -737,7 +702,6 @@ def _calculate_average_run(runs: list) -> dict:
     if not runs:
         return {}
     
-    # Get all numeric fields
     numeric_fields = {}
     for run in runs:
         for key, value in run.items():
@@ -746,7 +710,6 @@ def _calculate_average_run(runs: list) -> dict:
                     numeric_fields[key] = []
                 numeric_fields[key].append(value)
     
-    # Calculate averages
     avg_run = {}
     for field, values in numeric_fields.items():
         avg_run[field] = sum(values) / len(values)
@@ -764,7 +727,6 @@ def _calculate_statistics(runs: list) -> dict:
         'metrics': {}
     }
     
-    # Get all numeric fields
     numeric_fields = {}
     for run in runs:
         for key, value in run.items():
@@ -773,7 +735,6 @@ def _calculate_statistics(runs: list) -> dict:
                     numeric_fields[key] = []
                 numeric_fields[key].append(value)
     
-    # Calculate statistics for each field
     for field, values in numeric_fields.items():
         stats['metrics'][field] = {
             'min': min(values),
@@ -1015,15 +976,49 @@ def get_threshold_history(threshold_id):
         return jsonify({'error': str(e)}), 500
 
 
+def _dashboard_statistics_shape(raw):
+    """Convert MongoDB threshold stats to dashboard-expected shape."""
+    if not raw:
+        return {
+            'total_runs': 0,
+            'pass_rate': 0,
+            'on_target_count': 0,
+            'below_min_count': 0,
+            'above_max_count': 0,
+            'off_target_count': 0,
+            'failures': []
+        }
+    total = raw.get('total', 0)
+    passed = raw.get('passed', 0)
+    failed = raw.get('failed', 0)
+    pass_rate_pct = raw.get('pass_rate', 0)
+    return {
+        'total_runs': total,
+        'pass_rate': (pass_rate_pct / 100.0) if pass_rate_pct else 0,
+        'on_target_count': passed,
+        'below_min_count': 0,
+        'above_max_count': 0,
+        'off_target_count': failed,
+        'failures': raw.get('failures', [])
+    }
+
+
 @app.route('/api/statistics/thresholds', methods=['GET'])
 def get_threshold_statistics():
-    """Get statistics on threshold compliance."""
+    """Get statistics on threshold compliance. Returns dashboard-friendly shape."""
     try:
-        from data.mongodb_client import SimulationComparator
+        from data.mongodb_client import SimulationComparator, init_mongodb
         
         threshold_id = request.args.get('threshold_id')
         agent_name = request.args.get('agent')
         days = request.args.get('days', default=30, type=int)
+        
+        db = init_mongodb()
+        if db is None:
+            return jsonify({
+                'success': True,
+                'statistics': _dashboard_statistics_shape(None)
+            }), 200
         
         stats = SimulationComparator.get_statistics(
             threshold_id=threshold_id,
@@ -1033,12 +1028,15 @@ def get_threshold_statistics():
         
         return jsonify({
             'success': True,
-            'statistics': stats
+            'statistics': _dashboard_statistics_shape(stats)
         }), 200
     
     except Exception as e:
         logger.error(f"Error fetching statistics: {e}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({
+            'success': True,
+            'statistics': _dashboard_statistics_shape(None)
+        }), 200
 
 @app.route('/api/analysis/architecture', methods=['GET'])
 def get_architecture_description():
@@ -1254,7 +1252,6 @@ def get_real_data_benchmark():
 if __name__ == '__main__':
     import os
     
-    # Get configuration from environment
     host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', 5001))
     debug = os.getenv('DEBUG', 'False').lower() == 'true'
@@ -1278,20 +1275,19 @@ if __name__ == '__main__':
     
     print(f"   Mock: ✓ (fallback)")
     
-    # Determine what will be used
     if sources['csv']['available']:
-        print("\n✓ Real CSV data available for comparison")
+        print("\nReal CSV data available for comparison")
         if sources['manual']['available']:
-            print("✓ Manual bot runs available")
+            print("Manual bot runs available")
         else:
-            print("ℹ No manual runs - using mock bot data")
+            print("No manual runs - using mock bot data")
     else:
-        print("\nℹ No real CSV data found at data/sim_data.csv")
+        print("\nNo real CSV data found at data/sim_data.csv")
         print("   Dashboard will use mock data only")
     
     print(f"\nLoaded {len(bots)} agents:")
     for bot in bots:
-        print(f"   • {bot.name}: {bot.kpi_focus}")
+        print(f"   {bot.name}: {bot.kpi_focus}")
     
     print(f"\nAPI Server starting:")
     print(f"   URL: http://{host}:{port}")

@@ -7,7 +7,6 @@ import json
 import random
 from datetime import datetime, timedelta
 from data.forio_data_api import ForioDataAPI
-from data.data_loader import generate_mock_runs
 
 def generate_realistic_runs(n=10):
     """Generate realistic simulation runs with F1-F4 and all outputs."""
@@ -90,19 +89,19 @@ def save_data_for_dashboard(runs, save_to_data_api=True):
     data_dict = {run['id']: run for run in runs}
     with open('simulation_data.json', 'w') as f:
         json.dump(data_dict, f, indent=2, default=str)
-    print(f"✅ Saved {len(runs)} runs to simulation_data.json")
+    print(f"Saved {len(runs)} runs to simulation_data.json")
     
     # Also save as list format (automated_dataset.json)
     with open('automated_dataset.json', 'w') as f:
         json.dump(runs, f, indent=2, default=str)
-    print(f"✅ Saved {len(runs)} runs to automated_dataset.json")
+    print(f"Saved {len(runs)} runs to automated_dataset.json")
     
     # Save to Data API if configured
     if save_to_data_api:
         try:
             api = ForioDataAPI()
             if api.is_configured():
-                print(f"\n💾 Saving to Forio Data API...")
+                print(f"\nSaving to Forio Data API...")
                 saved_count = 0
                 for run in runs:
                     # Use POST to auto-generate ID (avoids ID format issues)
@@ -116,23 +115,22 @@ def save_data_for_dashboard(runs, save_to_data_api=True):
                         saved = api.save_simulation_result(run, document_id=None)
                         if saved:
                             saved_count += 1
-                print(f"✅ Saved {saved_count}/{len(runs)} runs to Data API")
+                print(f"Saved {saved_count}/{len(runs)} runs to Data API")
             else:
-                print("⚠️  Data API not configured, skipping Data API save")
+                print("Data API not configured, skipping Data API save")
         except Exception as e:
-            print(f"⚠️  Could not save to Data API: {e}")
+            print(f"Could not save to Data API: {e}")
 
 
 def main():
     print("=" * 70)
-    print("📊 Generating Dashboard Data")
+    print("Generating Dashboard Data")
     print("=" * 70)
     
-    # Generate realistic runs
-    print("\n🔄 Generating simulation runs...")
+    print("\nGenerating simulation runs...")
     runs = generate_realistic_runs(n=10)
     
-    print(f"\n✅ Generated {len(runs)} simulation runs")
+    print(f"\nGenerated {len(runs)} simulation runs")
     print("\nSample run:")
     sample = runs[0]
     print(f"  Strategy: {sample['strategy']}")
@@ -141,18 +139,12 @@ def main():
     print(f"  Compromised Systems: {sample['compromised_systems']}")
     print(f"  Systems Availability: {sample['systems_availability']:.1%}")
     
-    # Save data
-    print("\n💾 Saving data...")
+    print("\nSaving data...")
     save_data_for_dashboard(runs, save_to_data_api=True)
     
     print("\n" + "=" * 70)
-    print("✅ Data Generation Complete!")
+    print("Data generation complete!")
     print("=" * 70)
-    print("\n📋 Next steps:")
-    print("  1. Start dashboard: python dashboard.py")
-    print("  2. Open browser: http://localhost:5000")
-    print("  3. View simulation results and agent evaluations")
-    print("\n💡 The dashboard will now display the generated data!")
 
 
 if __name__ == '__main__':

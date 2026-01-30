@@ -2,15 +2,15 @@
   "simple_deterministic": {
     "collaborative": {
       "metrics": {
-        "total_profit": 12176000.0,
-        "total_compromised_systems": "43",
-        "average_compromised_systems": 8.6,
-        "total_systems_at_risk": "39",
-        "average_systems_at_risk": 7.8,
-        "average_availability": 0.914,
-        "final_profit": 2268000.0,
-        "final_compromised": "9",
-        "final_systems_at_risk": "6"
+        "total_profit": 11745000.0,
+        "total_compromised_systems": "66",
+        "average_compromised_systems": 13.2,
+        "total_systems_at_risk": "59",
+        "average_systems_at_risk": 11.8,
+        "average_availability": 0.868,
+        "final_profit": 2086000.0,
+        "final_compromised": "2",
+        "final_systems_at_risk": "1"
       },
       "config": {
         "collaborative": true,
@@ -29,9 +29,9 @@
         },
         {
           "year": 2,
-          "profit": 2399000.0,
-          "compromised": "15",
-          "systems_at_risk": "17",
+          "profit": 2233000.0,
+          "compromised": "30",
+          "systems_at_risk": "27",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -39,47 +39,47 @@
         },
         {
           "year": 3,
-          "profit": 2501000.0,
-          "compromised": "11",
-          "systems_at_risk": "11",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 2294000.0,
+          "compromised": "10",
+          "systems_at_risk": "12",
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
-          "profit": 2401000.0,
-          "compromised": "6",
-          "systems_at_risk": "5",
-          "F1": 44.96356034817573,
-          "F2": 37.59109912956067,
-          "F3": 12.670489593566517,
-          "F4": 4.774850928697083
+          "profit": 2525000.0,
+          "compromised": "22",
+          "systems_at_risk": "19",
+          "F1": 47.88343822743341,
+          "F2": 39.106819553409785,
+          "F3": 8.311061298387791,
+          "F4": 4.698680920769032
         },
         {
           "year": 5,
-          "profit": 2268000.0,
-          "compromised": "9",
-          "systems_at_risk": "6",
-          "F1": 44.86255272734733,
-          "F2": 37.50665324809577,
-          "F3": 12.642026189008094,
-          "F4": 4.988767835548803
+          "profit": 2086000.0,
+          "compromised": "2",
+          "systems_at_risk": "1",
+          "F1": 50.7932023326084,
+          "F2": 40.27744952751208,
+          "F3": 4.464674069939759,
+          "F4": 4.464674069939759
         }
       ]
     },
     "uncollaborative": {
       "metrics": {
-        "total_profit": 11415000.0,
-        "total_compromised_systems": "47",
-        "average_compromised_systems": 9.4,
-        "total_systems_at_risk": "48",
-        "average_systems_at_risk": 9.6,
-        "average_availability": 0.906,
-        "final_profit": 2195000.0,
-        "final_compromised": "3",
-        "final_systems_at_risk": "5"
+        "total_profit": 11760000.0,
+        "total_compromised_systems": "33",
+        "average_compromised_systems": 6.6,
+        "total_systems_at_risk": "24",
+        "average_systems_at_risk": 4.8,
+        "average_availability": 0.9339999999999999,
+        "final_profit": 2238000.0,
+        "final_compromised": "5",
+        "final_systems_at_risk": "2"
       },
       "config": {
         "collaborative": false,
@@ -90,7 +90,7 @@
           "year": 1,
           "profit": 2607000.0,
           "compromised": "2",
-          "systems_at_risk": 0,
+          "systems_at_risk": "1",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -98,9 +98,9 @@
         },
         {
           "year": 2,
-          "profit": 2142000.0,
-          "compromised": "4",
-          "systems_at_risk": "5",
+          "profit": 2185000.0,
+          "compromised": "12",
+          "systems_at_risk": "10",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -108,47 +108,47 @@
         },
         {
           "year": 3,
-          "profit": 2238000.0,
-          "compromised": "21",
-          "systems_at_risk": "21",
-          "F1": 40.0,
-          "F2": 35.0,
-          "F3": 20.0,
-          "F4": 5.0
+          "profit": 2302000.0,
+          "compromised": "12",
+          "systems_at_risk": "11",
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
-          "profit": 2233000.0,
-          "compromised": "17",
-          "systems_at_risk": "17",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 2428000.0,
+          "compromised": "2",
+          "systems_at_risk": 0,
+          "F1": 49.3124266308905,
+          "F2": 39.86248532617811,
+          "F3": 6.255240650679188,
+          "F4": 4.569847392252223
         },
         {
           "year": 5,
-          "profit": 2195000.0,
-          "compromised": "3",
-          "systems_at_risk": "5",
-          "F1": 44.96356034817573,
-          "F2": 37.59109912956067,
-          "F3": 12.670489593566517,
-          "F4": 4.774850928697083
+          "profit": 2238000.0,
+          "compromised": "5",
+          "systems_at_risk": "2",
+          "F1": 49.10121646781828,
+          "F2": 39.691750227513715,
+          "F3": 6.22844881567632,
+          "F4": 4.978584488991674
         }
       ]
     },
     "low_risk_tolerance": {
       "metrics": {
-        "total_profit": 11105000.0,
-        "total_compromised_systems": "48",
-        "average_compromised_systems": 9.6,
-        "total_systems_at_risk": "48",
-        "average_systems_at_risk": 9.6,
-        "average_availability": 0.9039999999999999,
-        "final_profit": 2332000.0,
-        "final_compromised": "11",
-        "final_systems_at_risk": "10"
+        "total_profit": 11825000.0,
+        "total_compromised_systems": "40",
+        "average_compromised_systems": 8.0,
+        "total_systems_at_risk": "41",
+        "average_systems_at_risk": 8.2,
+        "average_availability": 0.9199999999999999,
+        "final_profit": 2162000.0,
+        "final_compromised": "4",
+        "final_systems_at_risk": "4"
       },
       "config": {
         "collaborative": true,
@@ -159,7 +159,7 @@
           "year": 1,
           "profit": 2607000.0,
           "compromised": "2",
-          "systems_at_risk": 0,
+          "systems_at_risk": "4",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -167,9 +167,9 @@
         },
         {
           "year": 2,
-          "profit": 2082000.0,
-          "compromised": "16",
-          "systems_at_risk": "16",
+          "profit": 2400000.0,
+          "compromised": "12",
+          "systems_at_risk": "13",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -177,47 +177,47 @@
         },
         {
           "year": 3,
-          "profit": 2029000.0,
-          "compromised": "5",
-          "systems_at_risk": "6",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 2399000.0,
+          "compromised": "15",
+          "systems_at_risk": "13",
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
-          "profit": 2055000.0,
-          "compromised": "14",
-          "systems_at_risk": "16",
-          "F1": 42.49224158510385,
-          "F2": 36.28550966817856,
-          "F3": 16.23299116734304,
-          "F4": 4.989257579374552
+          "profit": 2257000.0,
+          "compromised": "7",
+          "systems_at_risk": "7",
+          "F1": 49.3124266308905,
+          "F2": 39.86248532617811,
+          "F3": 6.255240650679188,
+          "F4": 4.569847392252223
         },
         {
           "year": 5,
-          "profit": 2332000.0,
-          "compromised": "11",
-          "systems_at_risk": "10",
-          "F1": 44.96403000944505,
-          "F2": 37.58992497638737,
-          "F3": 12.661847826211094,
-          "F4": 4.784197187956477
+          "profit": 2162000.0,
+          "compromised": "4",
+          "systems_at_risk": "4",
+          "F1": 49.85024090607336,
+          "F2": 40.088712005982146,
+          "F3": 5.155727246777156,
+          "F4": 4.905319841167338
         }
       ]
     },
     "high_risk_tolerance": {
       "metrics": {
-        "total_profit": 10854000.0,
-        "total_compromised_systems": "55",
-        "average_compromised_systems": 11.0,
-        "total_systems_at_risk": "54",
-        "average_systems_at_risk": 10.8,
-        "average_availability": 0.89,
-        "final_profit": 2363000.0,
-        "final_compromised": "3",
-        "final_systems_at_risk": "1"
+        "total_profit": 11519000.0,
+        "total_compromised_systems": "37",
+        "average_compromised_systems": 7.4,
+        "total_systems_at_risk": "29",
+        "average_systems_at_risk": 5.8,
+        "average_availability": 0.9259999999999999,
+        "final_profit": 2324000.0,
+        "final_compromised": "7",
+        "final_systems_at_risk": "5"
       },
       "config": {
         "collaborative": true,
@@ -228,7 +228,7 @@
           "year": 1,
           "profit": 2607000.0,
           "compromised": "2",
-          "systems_at_risk": "2",
+          "systems_at_risk": "1",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -236,9 +236,9 @@
         },
         {
           "year": 2,
-          "profit": 1666000.0,
-          "compromised": "22",
-          "systems_at_risk": "22",
+          "profit": 2317000.0,
+          "compromised": "14",
+          "systems_at_risk": "11",
           "F1": 40.0,
           "F2": 35.0,
           "F3": 20.0,
@@ -246,33 +246,33 @@
         },
         {
           "year": 3,
-          "profit": 1992000.0,
-          "compromised": "17",
-          "systems_at_risk": "17",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 2185000.0,
+          "compromised": "12",
+          "systems_at_risk": "11",
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
-          "profit": 2226000.0,
-          "compromised": "11",
-          "systems_at_risk": "12",
-          "F1": 44.96356034817573,
-          "F2": 37.59109912956067,
-          "F3": 12.670489593566517,
-          "F4": 4.774850928697083
+          "profit": 2086000.0,
+          "compromised": "2",
+          "systems_at_risk": "1",
+          "F1": 49.3124266308905,
+          "F2": 39.86248532617811,
+          "F3": 6.255240650679188,
+          "F4": 4.569847392252223
         },
         {
           "year": 5,
-          "profit": 2363000.0,
-          "compromised": "3",
-          "systems_at_risk": "1",
-          "F1": 47.23178795811318,
-          "F2": 38.759647982858354,
-          "F3": 9.234161688308784,
-          "F4": 4.774402370719675
+          "profit": 2324000.0,
+          "compromised": "7",
+          "systems_at_risk": "5",
+          "F1": 49.10121646781828,
+          "F2": 39.691750227513715,
+          "F3": 6.22844881567632,
+          "F4": 4.978584488991674
         }
       ]
     }
@@ -280,15 +280,15 @@
   "simple_unpredictable": {
     "collaborative": {
       "metrics": {
-        "total_profit": 10672843.603951355,
-        "total_compromised_systems": "52",
-        "average_compromised_systems": 10.4,
-        "total_systems_at_risk": "49",
-        "average_systems_at_risk": 9.8,
-        "average_availability": 0.8959999999999999,
-        "final_profit": 2151918.980782373,
-        "final_compromised": "11",
-        "final_systems_at_risk": "11"
+        "total_profit": 11635479.642468775,
+        "total_compromised_systems": "26",
+        "average_compromised_systems": 5.2,
+        "total_systems_at_risk": "26",
+        "average_systems_at_risk": 5.2,
+        "average_availability": 0.9480000000000001,
+        "final_profit": 2332150.6736384705,
+        "final_compromised": "4",
+        "final_systems_at_risk": "4"
       },
       "config": {
         "collaborative": true,
@@ -317,47 +317,47 @@
         },
         {
           "year": 3,
-          "profit": 995161.9744402866,
-          "compromised": "19",
-          "systems_at_risk": "16",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 1777566.3201016085,
+          "compromised": "0",
+          "systems_at_risk": 0,
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
           "profit": 1977472.10481847,
           "compromised": "10",
           "systems_at_risk": "11",
-          "F1": 46.21154106040813,
-          "F2": 38.001711788819314,
-          "F3": 11.079327897653048,
-          "F4": 4.70741925311951
+          "F1": 44.769301050708094,
+          "F2": 37.46002740977616,
+          "F3": 12.791228871630883,
+          "F4": 4.9794426678848795
         },
         {
           "year": 5,
-          "profit": 2151918.980782373,
-          "compromised": "11",
-          "systems_at_risk": "11",
-          "F1": 46.87133454160929,
-          "F2": 38.31488651005103,
-          "F3": 9.901829606537348,
-          "F4": 4.911949341802329
+          "profit": 2332150.6736384705,
+          "compromised": "4",
+          "systems_at_risk": "4",
+          "F1": 47.886280102895995,
+          "F2": 39.10564936939576,
+          "F3": 8.292004015873905,
+          "F4": 4.716066511834332
         }
       ]
     },
     "uncollaborative": {
       "metrics": {
-        "total_profit": 13224093.87743245,
-        "total_compromised_systems": "52",
-        "average_compromised_systems": 10.4,
-        "total_systems_at_risk": "50",
-        "average_systems_at_risk": 10.0,
-        "average_availability": 0.8959999999999999,
-        "final_profit": 3303707.38021008,
-        "final_compromised": "14",
-        "final_systems_at_risk": "15"
+        "total_profit": 13226514.96293932,
+        "total_compromised_systems": "46",
+        "average_compromised_systems": 9.2,
+        "total_systems_at_risk": "44",
+        "average_systems_at_risk": 8.8,
+        "average_availability": 0.908,
+        "final_profit": 2062873.1182753828,
+        "final_compromised": "7",
+        "final_systems_at_risk": "8"
       },
       "config": {
         "collaborative": false,
@@ -386,47 +386,47 @@
         },
         {
           "year": 3,
-          "profit": 1860064.4095271686,
+          "profit": 2617976.468050735,
           "compromised": "6",
           "systems_at_risk": "4",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
-          "profit": 2176790.0012389505,
-          "compromised": "16",
-          "systems_at_risk": "15",
-          "F1": 42.49224158510385,
-          "F2": 36.28550966817856,
-          "F3": 16.23299116734304,
-          "F4": 4.989257579374552
+          "profit": 2662133.2901569502,
+          "compromised": "17",
+          "systems_at_risk": "16",
+          "F1": 44.769301050708094,
+          "F2": 37.46002740977616,
+          "F3": 12.791228871630883,
+          "F4": 4.9794426678848795
         },
         {
           "year": 5,
-          "profit": 3303707.38021008,
-          "compromised": "14",
-          "systems_at_risk": "15",
-          "F1": 44.96403000944505,
-          "F2": 37.58992497638737,
-          "F3": 12.661847826211094,
-          "F4": 4.784197187956477
+          "profit": 2062873.1182753828,
+          "compromised": "7",
+          "systems_at_risk": "8",
+          "F1": 49.320332207537525,
+          "F2": 39.864066441507504,
+          "F3": 6.229310359276921,
+          "F4": 4.58629099167805
         }
       ]
     },
     "low_risk_tolerance": {
       "metrics": {
-        "total_profit": 13051827.300933966,
-        "total_compromised_systems": "36",
-        "average_compromised_systems": 7.2,
-        "total_systems_at_risk": "36",
-        "average_systems_at_risk": 7.2,
-        "average_availability": 0.9280000000000002,
-        "final_profit": 2591605.8838550425,
-        "final_compromised": "4",
-        "final_systems_at_risk": "5"
+        "total_profit": 12218376.76068655,
+        "total_compromised_systems": "43",
+        "average_compromised_systems": 8.6,
+        "total_systems_at_risk": "43",
+        "average_systems_at_risk": 8.6,
+        "average_availability": 0.914,
+        "final_profit": 1578657.792171158,
+        "final_compromised": "23",
+        "final_systems_at_risk": "24"
       },
       "config": {
         "collaborative": true,
@@ -455,47 +455,47 @@
         },
         {
           "year": 3,
-          "profit": 2229734.463860042,
-          "compromised": "12",
-          "systems_at_risk": "11",
-          "F1": 40.0,
-          "F2": 35.0,
-          "F3": 20.0,
-          "F4": 5.0
+          "profit": 1693378.6670415106,
+          "compromised": "7",
+          "systems_at_risk": "6",
+          "F1": 40.88669950738916,
+          "F2": 35.467980295566505,
+          "F3": 18.7192118226601,
+          "F4": 4.926108374384237
         },
         {
           "year": 4,
-          "profit": 2415595.085719297,
-          "compromised": "13",
-          "systems_at_risk": "11",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 3131448.433974297,
+          "compromised": "6",
+          "systems_at_risk": "4",
+          "F1": 41.729915856349564,
+          "F2": 35.902907441984524,
+          "F3": 17.444651907175245,
+          "F4": 4.922524794490652
         },
         {
           "year": 5,
-          "profit": 2591605.8838550425,
-          "compromised": "4",
-          "systems_at_risk": "5",
-          "F1": 44.96356034817573,
-          "F2": 37.59109912956067,
-          "F3": 12.670489593566517,
-          "F4": 4.774850928697083
+          "profit": 1578657.792171158,
+          "compromised": "23",
+          "systems_at_risk": "24",
+          "F1": 41.69761054688588,
+          "F2": 35.87511312436472,
+          "F3": 17.431147090144524,
+          "F4": 4.996129238604879
         }
       ]
     },
     "high_risk_tolerance": {
       "metrics": {
-        "total_profit": 12278613.718129966,
-        "total_compromised_systems": "37",
-        "average_compromised_systems": 7.4,
-        "total_systems_at_risk": "43",
-        "average_systems_at_risk": 8.6,
-        "average_availability": 0.9259999999999999,
-        "final_profit": 2391062.592940009,
-        "final_compromised": "16",
-        "final_systems_at_risk": "18"
+        "total_profit": 11636935.256863447,
+        "total_compromised_systems": "33",
+        "average_compromised_systems": 6.6,
+        "total_systems_at_risk": "39",
+        "average_systems_at_risk": 7.8,
+        "average_availability": 0.9339999999999999,
+        "final_profit": 1497039.3493753544,
+        "final_compromised": "3",
+        "final_systems_at_risk": "5"
       },
       "config": {
         "collaborative": true,
@@ -534,23 +534,23 @@
         },
         {
           "year": 4,
-          "profit": 2277736.9548940784,
-          "compromised": "0",
-          "systems_at_risk": "1",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 2530081.737192215,
+          "compromised": "9",
+          "systems_at_risk": "10",
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 5,
-          "profit": 2391062.592940009,
-          "compromised": "16",
-          "systems_at_risk": "18",
-          "F1": 42.49224158510385,
-          "F2": 36.28550966817856,
-          "F3": 16.23299116734304,
-          "F4": 4.989257579374552
+          "profit": 1497039.3493753544,
+          "compromised": "3",
+          "systems_at_risk": "5",
+          "F1": 47.88343822743341,
+          "F2": 39.106819553409785,
+          "F3": 8.311061298387791,
+          "F4": 4.698680920769032
         }
       ]
     }
@@ -558,15 +558,15 @@
   "advanced_ransomware": {
     "collaborative": {
       "metrics": {
-        "total_profit": 5627000.0,
-        "total_compromised_systems": "24",
-        "average_compromised_systems": 4.8,
-        "total_systems_at_risk": "25",
-        "average_systems_at_risk": 5.0,
-        "average_availability": 0.952,
-        "final_profit": 1309000.0,
-        "final_compromised": "7",
-        "final_systems_at_risk": "8"
+        "total_profit": 4017000.0,
+        "total_compromised_systems": "32",
+        "average_compromised_systems": 6.4,
+        "total_systems_at_risk": "33",
+        "average_systems_at_risk": 6.6,
+        "average_availability": 0.9359999999999999,
+        "final_profit": -367000.0,
+        "final_compromised": "15",
+        "final_systems_at_risk": "16"
       },
       "config": {
         "collaborative": true,
@@ -598,44 +598,44 @@
           "profit": 1247000.0,
           "compromised": "1",
           "systems_at_risk": "2",
-          "F1": 43.867924528301884,
-          "F2": 36.79245283018868,
-          "F3": 14.622641509433961,
-          "F4": 4.716981132075472
+          "F1": 46.15384615384615,
+          "F2": 38.009049773755656,
+          "F3": 11.312217194570136,
+          "F4": 4.524886877828054
         },
         {
           "year": 4,
-          "profit": 1543000.0,
+          "profit": 1609000.0,
           "compromised": "2",
           "systems_at_risk": "4",
-          "F1": 43.74412041392286,
-          "F2": 36.68861712135466,
-          "F3": 14.58137347130762,
-          "F4": 4.985888993414863
+          "F1": 45.935600090069805,
+          "F2": 37.829317721233956,
+          "F3": 11.258725512272012,
+          "F4": 4.976356676424229
         },
         {
           "year": 5,
-          "profit": 1309000.0,
-          "compromised": "7",
-          "systems_at_risk": "8",
-          "F1": 43.73794854912289,
-          "F2": 36.6834407186192,
-          "F3": 14.579316183040964,
-          "F4": 4.99929454921695
+          "profit": -367000.0,
+          "compromised": "15",
+          "systems_at_risk": "16",
+          "F1": 45.924741954728105,
+          "F2": 37.82037572742315,
+          "F3": 11.256064204590224,
+          "F4": 4.998818113258518
         }
       ]
     },
     "uncollaborative": {
       "metrics": {
-        "total_profit": 6179000.0,
-        "total_compromised_systems": "34",
-        "average_compromised_systems": 6.8,
-        "total_systems_at_risk": "39",
-        "average_systems_at_risk": 7.8,
-        "average_availability": 0.932,
-        "final_profit": 1143000.0,
-        "final_compromised": "18",
-        "final_systems_at_risk": "17"
+        "total_profit": 6764000.0,
+        "total_compromised_systems": "28",
+        "average_compromised_systems": 5.6,
+        "total_systems_at_risk": "33",
+        "average_systems_at_risk": 6.6,
+        "average_availability": 0.944,
+        "final_profit": 1063000.0,
+        "final_compromised": "11",
+        "final_systems_at_risk": "10"
       },
       "config": {
         "collaborative": false,
@@ -674,29 +674,29 @@
         },
         {
           "year": 4,
-          "profit": 835000.0,
-          "compromised": "0",
-          "systems_at_risk": "2",
-          "F1": 43.867924528301884,
-          "F2": 36.79245283018868,
-          "F3": 14.622641509433961,
-          "F4": 4.716981132075472
+          "profit": 1500000.0,
+          "compromised": "1",
+          "systems_at_risk": "3",
+          "F1": 46.15384615384615,
+          "F2": 38.009049773755656,
+          "F3": 11.312217194570136,
+          "F4": 4.524886877828054
         },
         {
           "year": 5,
-          "profit": 1143000.0,
-          "compromised": "18",
-          "systems_at_risk": "17",
-          "F1": 45.06441746223005,
-          "F2": 37.13041060339235,
-          "F3": 12.892761145611269,
-          "F4": 4.912410788766336
+          "profit": 1063000.0,
+          "compromised": "11",
+          "systems_at_risk": "10",
+          "F1": 45.935600090069805,
+          "F2": 37.829317721233956,
+          "F3": 11.258725512272012,
+          "F4": 4.976356676424229
         }
       ]
     },
     "low_risk_tolerance": {
       "metrics": {
-        "total_profit": 3985000.0,
+        "total_profit": 4798000.0,
         "total_compromised_systems": "30",
         "average_compromised_systems": 6.0,
         "total_systems_at_risk": "27",
@@ -733,47 +733,47 @@
         },
         {
           "year": 3,
-          "profit": 922000.0,
-          "compromised": "11",
-          "systems_at_risk": "8",
-          "F1": 43.867924528301884,
-          "F2": 36.79245283018868,
-          "F3": 14.622641509433961,
-          "F4": 4.716981132075472
+          "profit": 727000.0,
+          "compromised": "12",
+          "systems_at_risk": "9",
+          "F1": 46.15384615384615,
+          "F2": 38.009049773755656,
+          "F3": 11.312217194570136,
+          "F4": 4.524886877828054
         },
         {
           "year": 4,
-          "profit": 51000.0,
-          "compromised": "1",
-          "systems_at_risk": "1",
-          "F1": 47.39037812888336,
-          "F2": 38.38096928812356,
-          "F3": 9.524232203088939,
-          "F4": 4.704420379904136
+          "profit": 1059000.0,
+          "compromised": "0",
+          "systems_at_risk": 0,
+          "F1": 50.95610779409392,
+          "F2": 40.12828788123286,
+          "F3": 4.457802162336614,
+          "F4": 4.457802162336614
         },
         {
           "year": 5,
           "profit": 1998000.0,
           "compromised": "1",
           "systems_at_risk": 0,
-          "F1": 48.5191776629297,
-          "F2": 38.68632551147556,
-          "F3": 7.8826921886349215,
-          "F4": 4.911804636959825
+          "F1": 50.87804704105821,
+          "F2": 39.51436487129677,
+          "F3": 4.803794043822508,
+          "F4": 4.803794043822508
         }
       ]
     },
     "high_risk_tolerance": {
       "metrics": {
-        "total_profit": 6032000.0,
-        "total_compromised_systems": "34",
-        "average_compromised_systems": 6.8,
-        "total_systems_at_risk": "33",
-        "average_systems_at_risk": 6.6,
-        "average_availability": 0.932,
-        "final_profit": 165000.0,
-        "final_compromised": "17",
-        "final_systems_at_risk": "16"
+        "total_profit": 6436000.0,
+        "total_compromised_systems": "33",
+        "average_compromised_systems": 6.6,
+        "total_systems_at_risk": "31",
+        "average_systems_at_risk": 6.2,
+        "average_availability": 0.9339999999999999,
+        "final_profit": 1665000.0,
+        "final_compromised": "2",
+        "final_systems_at_risk": "1"
       },
       "config": {
         "collaborative": true,
@@ -802,33 +802,33 @@
         },
         {
           "year": 3,
-          "profit": 1543000.0,
+          "profit": 1697000.0,
           "compromised": "2",
           "systems_at_risk": "3",
-          "F1": 43.867924528301884,
-          "F2": 36.79245283018868,
-          "F3": 14.622641509433961,
-          "F4": 4.716981132075472
+          "F1": 46.15384615384615,
+          "F2": 38.009049773755656,
+          "F3": 11.312217194570136,
+          "F4": 4.524886877828054
         },
         {
           "year": 4,
-          "profit": 1925000.0,
-          "compromised": "1",
-          "systems_at_risk": 0,
-          "F1": 43.74412041392286,
-          "F2": 36.68861712135466,
-          "F3": 14.58137347130762,
-          "F4": 4.985888993414863
+          "profit": 675000.0,
+          "compromised": "15",
+          "systems_at_risk": "13",
+          "F1": 45.935600090069805,
+          "F2": 37.829317721233956,
+          "F3": 11.258725512272012,
+          "F4": 4.976356676424229
         },
         {
           "year": 5,
-          "profit": 165000.0,
-          "compromised": "17",
-          "systems_at_risk": "16",
-          "F1": 43.73794854912289,
-          "F2": 36.6834407186192,
-          "F3": 14.579316183040964,
-          "F4": 4.99929454921695
+          "profit": 1665000.0,
+          "compromised": "2",
+          "systems_at_risk": "1",
+          "F1": 50.94228243087511,
+          "F2": 40.11036611409737,
+          "F3": 4.47367572751376,
+          "F4": 4.47367572751376
         }
       ]
     }
@@ -836,15 +836,15 @@
   "advanced_ransomware_paid": {
     "collaborative": {
       "metrics": {
-        "total_profit": 6771000.0,
-        "total_compromised_systems": "51",
-        "average_compromised_systems": 10.2,
-        "total_systems_at_risk": "53",
-        "average_systems_at_risk": 10.6,
-        "average_availability": 0.8979999999999999,
-        "final_profit": 1288000.0,
-        "final_compromised": "17",
-        "final_systems_at_risk": "18"
+        "total_profit": 6690000.0,
+        "total_compromised_systems": "26",
+        "average_compromised_systems": 5.2,
+        "total_systems_at_risk": "28",
+        "average_systems_at_risk": 5.6,
+        "average_availability": 0.9480000000000001,
+        "final_profit": 1347000.0,
+        "final_compromised": "0",
+        "final_systems_at_risk": "1"
       },
       "config": {
         "collaborative": true,
@@ -873,47 +873,47 @@
         },
         {
           "year": 3,
-          "profit": 1755000.0,
+          "profit": 1568000.0,
           "compromised": "2",
           "systems_at_risk": "4",
-          "F1": 43.867924528301884,
-          "F2": 36.79245283018868,
-          "F3": 14.622641509433961,
-          "F4": 4.716981132075472
+          "F1": 46.15384615384615,
+          "F2": 38.009049773755656,
+          "F3": 11.312217194570136,
+          "F4": 4.524886877828054
         },
         {
           "year": 4,
-          "profit": 1109000.0,
-          "compromised": "10",
-          "systems_at_risk": "8",
-          "F1": 43.74412041392286,
-          "F2": 36.68861712135466,
-          "F3": 14.58137347130762,
-          "F4": 4.985888993414863
+          "profit": 1156000.0,
+          "compromised": "2",
+          "systems_at_risk": 0,
+          "F1": 45.935600090069805,
+          "F2": 37.829317721233956,
+          "F3": 11.258725512272012,
+          "F4": 4.976356676424229
         },
         {
           "year": 5,
-          "profit": 1288000.0,
-          "compromised": "17",
-          "systems_at_risk": "18",
-          "F1": 45.86179500292227,
-          "F2": 37.55661893629457,
-          "F3": 11.727882086499125,
-          "F4": 4.853703974284045
+          "profit": 1347000.0,
+          "compromised": "0",
+          "systems_at_risk": "1",
+          "F1": 47.2161937070064,
+          "F2": 38.24657631471844,
+          "F3": 9.612268820149646,
+          "F4": 4.92496115812552
         }
       ]
     },
     "uncollaborative": {
       "metrics": {
-        "total_profit": 6843000.0,
-        "total_compromised_systems": "78",
-        "average_compromised_systems": 15.6,
-        "total_systems_at_risk": "76",
-        "average_systems_at_risk": 15.2,
-        "average_availability": 0.8440000000000001,
-        "final_profit": 869000.0,
-        "final_compromised": "46",
-        "final_systems_at_risk": "45"
+        "total_profit": 6724000.0,
+        "total_compromised_systems": "47",
+        "average_compromised_systems": 9.4,
+        "total_systems_at_risk": "45",
+        "average_systems_at_risk": 9.0,
+        "average_availability": 0.906,
+        "final_profit": 720000.0,
+        "final_compromised": "14",
+        "final_systems_at_risk": "13"
       },
       "config": {
         "collaborative": false,
@@ -942,47 +942,47 @@
         },
         {
           "year": 3,
-          "profit": 1363000.0,
-          "compromised": "10",
-          "systems_at_risk": "9",
-          "F1": 43.867924528301884,
-          "F2": 36.79245283018868,
-          "F3": 14.622641509433961,
-          "F4": 4.716981132075472
+          "profit": 1337000.0,
+          "compromised": "7",
+          "systems_at_risk": "6",
+          "F1": 46.15384615384615,
+          "F2": 38.009049773755656,
+          "F3": 11.312217194570136,
+          "F4": 4.524886877828054
         },
         {
           "year": 4,
-          "profit": 1607000.0,
-          "compromised": "2",
-          "systems_at_risk": "1",
-          "F1": 44.57317638335341,
-          "F2": 37.13041060339235,
-          "F3": 13.384002224487903,
-          "F4": 4.912410788766336
+          "profit": 1663000.0,
+          "compromised": "6",
+          "systems_at_risk": "5",
+          "F1": 46.730858829010714,
+          "F2": 38.25349987797573,
+          "F3": 10.112484192310253,
+          "F4": 4.903157100703304
         },
         {
           "year": 5,
-          "profit": 869000.0,
-          "compromised": "46",
-          "systems_at_risk": "45",
-          "F1": 44.53416925577282,
-          "F2": 37.09791683065625,
-          "F3": 13.372289541554574,
-          "F4": 4.995624372016354
+          "profit": 720000.0,
+          "compromised": "14",
+          "systems_at_risk": "13",
+          "F1": 46.68564709480868,
+          "F2": 38.21648992112668,
+          "F3": 10.10270044429274,
+          "F4": 4.995162539771902
         }
       ]
     },
     "low_risk_tolerance": {
       "metrics": {
-        "total_profit": 7042000.0,
-        "total_compromised_systems": "41",
-        "average_compromised_systems": 8.2,
-        "total_systems_at_risk": "45",
-        "average_systems_at_risk": 9.0,
-        "average_availability": 0.9179999999999999,
-        "final_profit": 1303000.0,
-        "final_compromised": "5",
-        "final_systems_at_risk": "5"
+        "total_profit": 8074000.0,
+        "total_compromised_systems": "33",
+        "average_compromised_systems": 6.6,
+        "total_systems_at_risk": "37",
+        "average_systems_at_risk": 7.4,
+        "average_availability": 0.9339999999999999,
+        "final_profit": 2101000.0,
+        "final_compromised": "2",
+        "final_systems_at_risk": "2"
       },
       "config": {
         "collaborative": true,
@@ -1014,44 +1014,44 @@
           "profit": 1164000.0,
           "compromised": "17",
           "systems_at_risk": "19",
-          "F1": 40.88669950738916,
-          "F2": 35.467980295566505,
-          "F3": 18.7192118226601,
-          "F4": 4.926108374384237
+          "F1": 43.39622641509434,
+          "F2": 36.79245283018868,
+          "F3": 15.09433962264151,
+          "F4": 4.716981132075472
         },
         {
           "year": 4,
-          "profit": 1315000.0,
-          "compromised": "9",
-          "systems_at_risk": "9",
-          "F1": 44.67329215622532,
-          "F2": 37.20800631588724,
-          "F3": 13.405006269446895,
-          "F4": 4.7136952584405325
+          "profit": 1549000.0,
+          "compromised": "4",
+          "systems_at_risk": "4",
+          "F1": 49.10159243804819,
+          "F2": 39.52993272587924,
+          "F3": 6.8551477475943114,
+          "F4": 4.513327088478242
         },
         {
           "year": 5,
-          "profit": 1303000.0,
-          "compromised": "5",
-          "systems_at_risk": "5",
-          "F1": 45.36297124987652,
-          "F2": 37.53747266186672,
-          "F3": 12.187303882328598,
-          "F4": 4.912252205928146
+          "profit": 2101000.0,
+          "compromised": "2",
+          "systems_at_risk": "2",
+          "F1": 48.86378562984368,
+          "F2": 39.33848298538578,
+          "F3": 6.82194717863756,
+          "F4": 4.975784206132973
         }
       ]
     },
     "high_risk_tolerance": {
       "metrics": {
-        "total_profit": 6110000.0,
-        "total_compromised_systems": "89",
-        "average_compromised_systems": 17.8,
-        "total_systems_at_risk": "90",
-        "average_systems_at_risk": 18.0,
-        "average_availability": 0.8220000000000001,
-        "final_profit": 512000.0,
-        "final_compromised": "35",
-        "final_systems_at_risk": "37"
+        "total_profit": 7357000.0,
+        "total_compromised_systems": "35",
+        "average_compromised_systems": 7.0,
+        "total_systems_at_risk": "36",
+        "average_systems_at_risk": 7.2,
+        "average_availability": 0.93,
+        "final_profit": 1005000.0,
+        "final_compromised": "4",
+        "final_systems_at_risk": "6"
       },
       "config": {
         "collaborative": true,
@@ -1080,33 +1080,33 @@
         },
         {
           "year": 3,
-          "profit": 1259000.0,
-          "compromised": "8",
-          "systems_at_risk": "7",
-          "F1": 42.58373205741627,
-          "F2": 36.36363636363637,
-          "F3": 16.267942583732058,
-          "F4": 4.784688995215311
+          "profit": 1453000.0,
+          "compromised": "6",
+          "systems_at_risk": "5",
+          "F1": 44.95412844036697,
+          "F2": 37.61467889908257,
+          "F3": 12.844036697247706,
+          "F4": 4.587155963302752
         },
         {
           "year": 4,
-          "profit": 955000.0,
-          "compromised": "29",
-          "systems_at_risk": "29",
-          "F1": 42.49224158510385,
-          "F2": 36.28550966817856,
-          "F3": 16.23299116734304,
-          "F4": 4.989257579374552
+          "profit": 1515000.0,
+          "compromised": "8",
+          "systems_at_risk": "8",
+          "F1": 44.769301050708094,
+          "F2": 37.46002740977616,
+          "F3": 12.791228871630883,
+          "F4": 4.9794426678848795
         },
         {
           "year": 5,
-          "profit": 512000.0,
-          "compromised": "35",
-          "systems_at_risk": "37",
-          "F1": 46.2144123005141,
-          "F2": 38.001346607247804,
-          "F3": 11.067737947527352,
-          "F4": 4.716503144710738
+          "profit": 1005000.0,
+          "compromised": "4",
+          "systems_at_risk": "6",
+          "F1": 45.57628746987898,
+          "F2": 37.883979777571284,
+          "F3": 11.614621886931694,
+          "F4": 4.925110865618046
         }
       ]
     }

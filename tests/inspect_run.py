@@ -12,7 +12,7 @@ PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 FORIO_ORG = os.getenv("FORIO_ORG", "mitcams")
 FORIO_PROJECT = os.getenv("FORIO_PROJECT", "cyberriskmanagement-ransomeware-2023")
 
-# Get OAuth token
+# get oauth token
 creds = base64.b64encode(f"{PUBLIC_KEY}:{PRIVATE_KEY}".encode()).decode()
 headers = {
     "Content-Type": "application/x-www-form-urlencoded",
@@ -23,7 +23,7 @@ r = requests.post("https://api.forio.com/v2/oauth/token", headers=headers, data=
 r.raise_for_status()
 token = r.json()["access_token"]
 
-# Fetch runs
+# fetch runs
 headers = {"Authorization": f"Bearer {token}"}
 url = f"https://forio.com/v2/run/{FORIO_ORG}/{FORIO_PROJECT}/;saved=true;trashed=false"
 url += "?sort=created&direction=desc&startRecord=0&endRecord=1"
@@ -38,7 +38,7 @@ if runs:
     print("=" * 70)
     print(json.dumps(runs[0], indent=2, default=str))
     
-    # Fetch variables for this run
+    # fetch variables for this run
     print("\n" + "=" * 70)
     print("Fetching Variables:")
     print("=" * 70)

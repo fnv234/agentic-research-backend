@@ -11,7 +11,6 @@ from bson.objectid import ObjectId
 
 logger = logging.getLogger(__name__)
 
-# MongoDB connection will be initialized lazily
 _db = None
 
 
@@ -31,11 +30,9 @@ def init_mongodb():
             client = MongoClient(mongo_uri)
             _db = client[db_name]
             
-            # Verify connection
             _db.command("ping")
-            logger.info(f"✓ MongoDB connected: {db_name}")
+            logger.info(f"MongoDB connected: {db_name}")
             
-            # Create collections if they don't exist
             _ensure_collections()
             
         except Exception as e:
@@ -50,20 +47,17 @@ def _ensure_collections():
     if _db is None:
         return
     
-    # Create thresholds collection with indexes
     if "thresholds" not in _db.list_collection_names():
         _db.create_collection("thresholds")
         _db.thresholds.create_index("agent_name")
         _db.thresholds.create_index("created_at")
     
-    # Create simulation_runs collection with indexes
     if "simulation_runs" not in _db.list_collection_names():
         _db.create_collection("simulation_runs")
         _db.simulation_runs.create_index("simulation_id")
         _db.simulation_runs.create_index("timestamp")
         _db.simulation_runs.create_index("threshold_id")
     
-    # Create comparisons collection
     if "comparisons" not in _db.list_collection_names():
         _db.create_collection("comparisons")
         _db.comparisons.create_index("simulation_id")
@@ -151,7 +145,6 @@ class ThresholdManager:
                 "is_active": True
             }))
             
-            # Convert ObjectId to string
             for t in thresholds:
                 t["_id"] = str(t["_id"])
             
@@ -253,14 +246,12 @@ class SimulationComparator:
             return None
         
         try:
-            # Determine status
             status = "on_target"
             if min_value is not None and actual_value < min_value:
                 status = "below_min"
             elif max_value is not None and actual_value > max_value:
                 status = "above_max"
             elif target_value is not None:
-                # Check if within acceptable range of target (±10%)
                 tolerance = abs(target_value) * 0.1
                 if not (target_value - tolerance <= actual_value <= target_value + tolerance):
                     status = "off_target"
@@ -296,13 +287,11 @@ class SimulationComparator:
         try:
             runs = list(db.simulation_runs.find({"simulation_id": simulation_id}))
             
-            # Convert ObjectIds to strings
             for run in runs:
                 run["_id"] = str(run["_id"])
                 if "threshold_id" in run:
                     run["threshold_id"] = str(run["threshold_id"])
             
-            # Group by agent and KPI
             results_by_agent = {}
             for run in runs:
                 agent = run["agent_name"]
@@ -320,7 +309,6 @@ class SimulationComparator:
                     "timestamp": run["timestamp"].isoformat()
                 })
             
-            # Calculate summaries
             summary = {
                 "total_runs": len(runs),
                 "passed": len([r for r in runs if r["status"] == "on_target"]),
@@ -403,21 +391,7 @@ class SimulationComparator:
             return {}
         
         try:
-            from datetime import timedelta
-            
-            # Build query
-            query = {
-                "timestamp": {
-                    "$gte": datetime.utcnow() - timedelta(days=days)
-                }
-            }
-            
-            if threshold_id:
-                query["threshold_id"] = threshold_id
-            if agent_name:
-                query["agent_name"] = agent_name
-            
-            runs = list(db.simulation_runs.find(query))
+            runs = list(db.simulation_runs.find())
             
             if not runs:
                 return {"total": 0, "passed": 0, "failed": 0, "pass_rate": 0}

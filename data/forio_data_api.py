@@ -76,7 +76,7 @@ class ForioDataAPI:
         """
         token = self._get_token()
         if not token:
-            print("❌ Cannot save: No authentication token")
+            print("Cannot save: No authentication token")
             return None
         
         headers = {
@@ -84,16 +84,12 @@ class ForioDataAPI:
             "Authorization": f"Bearer {token}"
         }
         
-        # Prepare the data - ensure it's a valid JSON object
-        # Remove None values to avoid issues
         clean_data = {k: v for k, v in result_data.items() if v is not None}
         
         if document_id:
-            # Use PUT to create/update with specific ID
             url = f"{self.base_url}/{self.org}/{self.project}/{self.collection_name}/{document_id}"
             method = "PUT"
         else:
-            # Use POST to create with auto-generated ID
             url = f"{self.base_url}/{self.org}/{self.project}/{self.collection_name}"
             method = "POST"
         
@@ -105,15 +101,15 @@ class ForioDataAPI:
             
             if response.status_code in [200, 201]:
                 saved_doc = response.json()
-                print(f"✅ Saved simulation result: {saved_doc.get('id', 'unknown')}")
+                print(f"Saved simulation result: {saved_doc.get('id', 'unknown')}")
                 return saved_doc
             else:
-                print(f"❌ Failed to save: HTTP {response.status_code}")
+                print(f"Failed to save: HTTP {response.status_code}")
                 print(f"   Response: {response.text[:200]}")
                 return None
                 
         except Exception as e:
-            print(f"❌ Error saving simulation result: {e}")
+            print(f"Error saving simulation result: {e}")
             return None
     
     def get_simulation_result(self, document_id: str) -> Optional[Dict]:
@@ -138,13 +134,13 @@ class ForioDataAPI:
             if response.status_code == 200:
                 return response.json()
             elif response.status_code == 404:
-                print(f"⚠️  Document {document_id} not found")
+                print(f"Document {document_id} not found")
                 return None
             else:
-                print(f"❌ Error retrieving document: HTTP {response.status_code}")
+                print(f"Error retrieving document: HTTP {response.status_code}")
                 return None
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
             return None
     
     def get_all_results(self, include_fields: Optional[List[str]] = None, 
@@ -172,7 +168,6 @@ class ForioDataAPI:
         headers = {"Authorization": f"Bearer {token}"}
         url = f"{self.base_url}/{self.org}/{self.project}/{self.collection_name}"
         
-        # Build query parameters
         params = {}
         if include_fields:
             params['include'] = ','.join(include_fields)
@@ -182,7 +177,6 @@ class ForioDataAPI:
             params['sort'] = sort_by
             params['direction'] = direction
         
-        # Add Range header for limiting results
         if limit:
             headers['Range'] = f"records 0-{limit-1}"
         
@@ -196,10 +190,10 @@ class ForioDataAPI:
                 else:
                     return [results] if results else []
             else:
-                print(f"❌ Error retrieving results: HTTP {response.status_code}")
+                print(f"Error retrieving results: HTTP {response.status_code}")
                 return []
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
             return []
     
     def search_results(self, query: Dict, limit: Optional[int] = None) -> List[Dict]:
@@ -222,7 +216,6 @@ class ForioDataAPI:
         headers = {"Authorization": f"Bearer {token}"}
         url = f"{self.base_url}/{self.org}/{self.project}/{self.collection_name}"
         
-        # Convert query dict to JSON string for q parameter
         query_str = json.dumps(query)
         params = {'q': query_str}
         
@@ -239,10 +232,10 @@ class ForioDataAPI:
                 else:
                     return [results] if results else []
             else:
-                print(f"❌ Error searching: HTTP {response.status_code}")
+                print(f"Error searching: HTTP {response.status_code}")
                 return []
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
             return []
     
     def delete_result(self, document_id: str) -> bool:
@@ -265,13 +258,13 @@ class ForioDataAPI:
         try:
             response = requests.delete(url, headers=headers, timeout=10)
             if response.status_code == 204:
-                print(f"✅ Deleted document: {document_id}")
+                print(f"Deleted document: {document_id}")
                 return True
             else:
-                print(f"❌ Failed to delete: HTTP {response.status_code}")
+                print(f"Failed to delete: HTTP {response.status_code}")
                 return False
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"Error: {e}")
             return False
     
     def save_batch_results(self, results: List[Dict]) -> List[Dict]:
@@ -294,7 +287,6 @@ class ForioDataAPI:
         }
         url = f"{self.base_url}/{self.org}/{self.project}/{self.collection_name}"
         
-        # Ensure each result has an id field
         for result in results:
             if 'id' not in result:
                 result['id'] = f"run_{hash(json.dumps(result, sort_keys=True))}"
@@ -304,14 +296,14 @@ class ForioDataAPI:
             
             if response.status_code in [200, 201]:
                 saved_docs = response.json()
-                print(f"✅ Saved {len(saved_docs)} simulation results")
+                print(f"Saved {len(saved_docs)} simulation results")
                 return saved_docs
             else:
-                print(f"❌ Failed to save batch: HTTP {response.status_code}")
+                print(f"Failed to save batch: HTTP {response.status_code}")
                 print(f"   Response: {response.text[:200]}")
                 return []
         except Exception as e:
-            print(f"❌ Error saving batch: {e}")
+            print(f"Error saving batch: {e}")
             return []
 
 
@@ -323,17 +315,16 @@ if __name__ == '__main__':
     api = ForioDataAPI()
     
     print("\n1. Configuration:")
-    print(f"   Configured: {'✓' if api.is_configured() else '✗'}")
+    print(f"   Configured: {'Yes' if api.is_configured() else 'No'}")
     if api.is_configured():
         print(f"   Org: {api.org}")
         print(f"   Project: {api.project}")
         print(f"   Collection: {api.collection_name}")
     
     if not api.is_configured():
-        print("\n⚠️  Set PUBLIC_KEY and PRIVATE_KEY in .env file")
+        print("\nSet PUBLIC_KEY and PRIVATE_KEY in .env file")
         exit(0)
     
-    # Test saving a sample result
     print("\n2. Testing save operation:")
     sample_result = {
         "F1": 30,
@@ -360,18 +351,15 @@ if __name__ == '__main__':
         doc_id = saved.get('id')
         print(f"   Document ID: {doc_id}")
         
-        # Test retrieval
         print("\n3. Testing retrieval:")
         retrieved = api.get_simulation_result(doc_id)
         if retrieved:
-            print(f"   ✓ Retrieved document with {len(retrieved)} fields")
+            print(f"Retrieved document with {len(retrieved)} fields")
         
-        # Test search
         print("\n4. Testing search:")
         search_results = api.search_results({"F1": {"$gte": 25}}, limit=5)
         print(f"   Found {len(search_results)} results with F1 >= 25")
         
-        # Test get all
         print("\n5. Testing get all:")
         all_results = api.get_all_results(limit=5)
         print(f"   Retrieved {len(all_results)} results")

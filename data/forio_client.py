@@ -129,7 +129,6 @@ class ForioClient:
         if not run_id:
             return
         
-        # Try multiple endpoints
         endpoints = [
             f"https://api.forio.com/v2/model/run/{run_id}/variables",
             f"https://api.forio.com/v2/run/{self.org}/{self.project}/{run_id}/variables"
@@ -184,10 +183,10 @@ if __name__ == '__main__':
     
     print("\n2. Connection Test:")
     status = client.test_connection()
-    print(f"   Configured: {'✓' if status['configured'] else '✗'}")
-    print(f"   Authenticated: {'✓' if status['authenticated'] else '✗'}")
+    print(f"   Configured: {'Yes' if status['configured'] else 'No'}")
+    print(f"   Authenticated: {'Yes' if status['authenticated'] else 'No'}")
     print(f"   Runs Found: {status['runs_found']}")
-    print(f"   Has Data: {'✓' if status['has_data'] else '✗'}")
+    print(f"   Has Data: {'Yes' if status['has_data'] else 'No'}")
     
     if status['authenticated']:
         print("\n3. Fetching Runs:")
@@ -206,9 +205,9 @@ if __name__ == '__main__':
             has_availability = 'systems_availability' in run
             
             print(f"\n   Data Available:")
-            print(f"   Profit: {'✓' if has_profit else '✗'}")
-            print(f"   Compromised: {'✓' if has_compromised else '✗'}")
-            print(f"   Availability: {'✓' if has_availability else '✗'}")
+            print(f"   Profit: {'Yes' if has_profit else 'No'}")
+            print(f"   Compromised: {'Yes' if has_compromised else 'No'}")
+            print(f"   Availability: {'Yes' if has_availability else 'No'}")
             
             if not (has_profit and has_compromised and has_availability):
                 print("\n   Vensim model not saving variables")

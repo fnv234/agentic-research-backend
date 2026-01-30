@@ -34,14 +34,13 @@ class ForioDataFetcher:
         data = {"grant_type": "client_credentials"}
         r = requests.post("https://api.forio.com/v2/oauth/token", headers=headers, data=data)
         if r.status_code >= 400:
-            raise RuntimeError(f"❌ OAuth error {r.status_code}: {r.text}")
+            raise RuntimeError(f"OAuth error {r.status_code}: {r.text}")
         return r.json().get("access_token")
     
     def fetch_runs(self, group=None, include_vars=None, limit=10):
         """Fetch existing saved runs from the project."""
         headers = {"Authorization": f"Bearer {self.token}"}
         
-        # Build query parameters
         group_filter = f"scope.group={group}" if group else ""
         include_str = ",".join(include_vars) if include_vars else ""
         
@@ -52,13 +51,12 @@ class ForioDataFetcher:
         if include_str:
             url += f"&include={include_str}"
         
-        print(f"🔗 GET {url}")
+        print(f"GET {url}")
         response = requests.get(url, headers=headers)
         print(f"Status: {response.status_code}")
         
         if response.status_code == 200:
             runs = response.json()
-            # For each run, fetch variables separately if needed
             if include_vars and runs:
                 for run in runs:
                     run_id = run.get('id')
@@ -89,12 +87,11 @@ class ExecutiveBot:
     
     def evaluate(self, results):
         """Judge simulation outputs according to role focus and personality."""
-        # Handle nested result structures
         if isinstance(results, dict):
             kpi_value = results.get(self.kpi_focus)
             if kpi_value is None and "variables" in results:
                 kpi_value = results["variables"].get(self.kpi_focus)
-            if kpi_value is None and "values" in results:
+            if kpi_value is None and "variables" in results:
                 kpi_value = results["values"].get(self.kpi_focus)
         else:
             kpi_value = None
@@ -109,7 +106,6 @@ class ExecutiveBot:
             elif kpi_value > self.target.get("max", float("inf")):
                 status = "above target"
         
-        # Personality-driven commentary
         if self.personality["risk_tolerance"] > 0.7 and status == "below target":
             comment = "(willing to take risks to improve)"
         elif self.personality["risk_tolerance"] < 0.3 and status == "above target":
@@ -158,7 +154,7 @@ def plot_kpis_comparison(runs_data, kpis, labels=None):
             val = run.get(kpi)
             if val is None and "variables" in run:
                 val = run["variables"].get(kpi)
-            if val is None and "values" in run:
+            if val is None and "variables" in run:
                 val = run["values"].get(kpi)
             vals.append(val if val is not None else 0)
         
@@ -170,15 +166,14 @@ def plot_kpis_comparison(runs_data, kpis, labels=None):
     
     plt.tight_layout()
     plt.savefig('kpi_comparison.png', dpi=150, bbox_inches='tight')
-    print("📊 Plot saved to kpi_comparison.png")
+    print("Plot saved to kpi_comparison.png")
     plt.show()
 
 
-# === Demo Workflow ===
+# demo workflow
 if __name__ == "__main__":
-    print("🤖 Multi-Agent Simulation Analysis Demo\n")
+    print("Multi-Agent Simulation Analysis Demo\n")
     
-    # Initialize data fetcher
     fetcher = ForioDataFetcher(
         org=FORIO_ORG,
         project=FORIO_PROJECT,
@@ -186,19 +181,17 @@ if __name__ == "__main__":
         private_key=PRIVATE_KEY
     )
     
-    # Fetch recent runs
     print("Fetching recent simulation runs...")
     kpis_to_fetch = ["accumulated_profit", "compromised_systems", "systems_availability"]
     runs = fetcher.fetch_runs(include_vars=kpis_to_fetch, limit=5)
     
     if not runs:
-        print("\n⚠️  No saved runs found. Please run the simulation through the Forio facilitator interface first.")
+        print("\nNo saved runs found. Please run the simulation through the Forio facilitator interface first.")
         print(f"   Visit: https://forio.com/app/{FORIO_ORG}/{FORIO_PROJECT}/")
         exit(0)
     
-    print(f"\n✅ Found {len(runs)} runs\n")
+    print(f"\nFound {len(runs)} runs\n")
     
-    # Create executive bots with different personalities
     cfo = ExecutiveBot(
         "CFO", 
         "accumulated_profit", 
@@ -220,24 +213,22 @@ if __name__ == "__main__":
     
     board = BoardRoom([cfo, cro, coo])
     
-    # Analyze each run
     for i, run in enumerate(runs[:3]):  # Analyze top 3 runs
         print(f"\n{'='*60}")
-        print(f"📊 Analyzing Run {i+1} (ID: {run.get('id', 'unknown')[:20]}...)")
+        print(f"Analyzing Run {i+1} (ID: {run.get('id', 'unknown')[:20]}...)")
         print(f"{'='*60}")
         
         feedback = board.run_meeting(run)
         for comment in feedback:
             print(f"  • {comment}")
         
-        print(f"\n🧠 Board Interaction: {board.simulate_interaction('collaborative')}")
+        print(f"\nBoard Interaction: {board.simulate_interaction('collaborative')}")
     
-    # Plot comparison
     print(f"\n{'='*60}")
-    print("📈 Generating KPI comparison plot...")
+    print("Generating KPI comparison plot...")
     try:
         plot_kpis_comparison(runs[:5], kpis_to_fetch)
     except Exception as e:
-        print(f"⚠️  Could not generate plot: {e}")
+        print(f"Could not generate plot: {e}")
     
-    print("\n✅ Analysis complete!")
+    print("\nAnalysis complete!")

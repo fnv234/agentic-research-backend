@@ -21,30 +21,26 @@ def load_csv_data(filepath: str = "data/sim_data.csv") -> List[Dict]:
         with open(filepath, 'r') as f:
             reader = csv.DictReader(f)
             for idx, row in enumerate(reader):
-                # Convert string values to appropriate types
                 run = {
                     'id': f"real_{idx+1}",
                     'source': 'real_data',
                     'timestamp': row.get('timestamp', datetime.now().isoformat()),
                 }
                 
-                # Convert numeric fields
                 for key, value in row.items():
                     if key == 'timestamp':
                         continue
                     try:
-                        # Try to convert to float
                         if '.' in value:
                             run[key] = float(value)
                         else:
                             run[key] = int(value)
                     except (ValueError, AttributeError):
-                        # Keep as string if conversion fails
                         run[key] = value
                 
                 runs.append(run)
         
-        print(f"✓ Loaded {len(runs)} runs from {filepath}")
+        print(f"Loaded {len(runs)} runs from {filepath}")
         
     except Exception as e:
         print(f"Error loading CSV data: {e}")
@@ -59,7 +55,6 @@ def load_manual_data(data_dir: str = "data") -> List[Dict]:
     if not os.path.exists(data_dir):
         return runs
     
-    # Look for JSON files in the data directory
     for filename in os.listdir(data_dir):
         if filename.startswith('run_') and filename.endswith('.json'):
             filepath = os.path.join(data_dir, filename)
@@ -72,7 +67,7 @@ def load_manual_data(data_dir: str = "data") -> List[Dict]:
                 print(f"Warning: Could not load {filepath}: {e}")
     
     if runs:
-        print(f"✓ Loaded {len(runs)} manual runs")
+        print(f"Loaded {len(runs)} manual runs")
     
     return runs
 
@@ -130,7 +125,6 @@ def load_runs(prefer_source: Optional[str] = None, limit: Optional[int] = None) 
         mock_runs = generate_mock_data()
         runs.extend(mock_runs)
     
-    # Apply limit if specified
     if limit and len(runs) > limit:
         runs = runs[:limit]
     
@@ -190,12 +184,10 @@ def compare_runs(real_runs: List[Dict], simulated_runs: List[Dict]) -> Dict:
     if not real_runs or not simulated_runs:
         return {'error': 'Need both real and simulated runs for comparison'}
     
-    # Get common metrics
     real_metrics = real_runs[0].keys()
     sim_metrics = simulated_runs[0].keys()
     common_metrics = set(real_metrics) & set(sim_metrics)
     
-    # Remove non-numeric fields
     exclude = {'id', 'source', 'timestamp'}
     numeric_metrics = [m for m in common_metrics if m not in exclude]
     
@@ -205,7 +197,6 @@ def compare_runs(real_runs: List[Dict], simulated_runs: List[Dict]) -> Dict:
     }
     
     for metric in numeric_metrics:
-        # Calculate statistics for real data
         real_values = [r.get(metric, 0) for r in real_runs if isinstance(r.get(metric), (int, float))]
         sim_values = [s.get(metric, 0) for s in simulated_runs if isinstance(s.get(metric), (int, float))]
         
@@ -240,7 +231,6 @@ def compare_runs(real_runs: List[Dict], simulated_runs: List[Dict]) -> Dict:
             'percent_difference': percent_diff
         }
     
-    # Generate summary insights
     comparison['summary'] = {
         'total_real_runs': len(real_runs),
         'total_simulated_runs': len(simulated_runs),
@@ -256,8 +246,7 @@ if __name__ == '__main__':
     print("Data Loader Test")
     print("=" * 70)
     
-    # Test loading from all sources
-    print("\n📊 Testing Data Sources:")
+    print("\nTesting Data Sources:")
     
     csv_runs = load_csv_data()
     print(f"\n  CSV Data: {len(csv_runs)} runs")
@@ -270,22 +259,19 @@ if __name__ == '__main__':
     mock_runs = generate_mock_data(5)
     print(f"\n  Mock Data: {len(mock_runs)} runs")
     
-    # Test unified loader
-    print("\n🔄 Testing Unified Loader:")
+    print("\nTesting Unified Loader:")
     all_runs = load_runs()
     print(f"  Total runs loaded: {len(all_runs)}")
     
-    # Test data source info
-    print("\n📋 Data Source Info:")
+    print("\nData Source Info:")
     info = get_data_source_info()
     for source, details in info.items():
         print(f"\n  {source.upper()}:")
         for key, value in details.items():
             print(f"    {key}: {value}")
     
-    # Test comparison if we have both real and simulated data
     if csv_runs and mock_runs:
-        print("\n📊 Testing Comparison:")
+        print("\nTesting Comparison:")
         comparison = compare_runs(csv_runs[:5], mock_runs[:5])
         if 'error' not in comparison:
             print(f"  Metrics compared: {comparison['summary']['metrics_compared']}")

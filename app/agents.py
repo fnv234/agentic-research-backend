@@ -28,7 +28,6 @@ class ExecutiveBot:
         if kpi_value is None:
             return f"{self.name}: KPI '{self.kpi_focus}' not found in results"
         
-        # Determine if target is met
         status = "on target"
         target_min = self.target.get("min", float("-inf"))
         target_max = self.target.get("max", float("inf"))
@@ -38,12 +37,10 @@ class ExecutiveBot:
         elif kpi_value > target_max:
             status = "above target"
         
-        # Add personality-driven commentary
         comment = self._get_personality_comment(status, kpi_value)
         
-        # Format value based on type
         if isinstance(kpi_value, float):
-            if kpi_value < 1 and kpi_value > 0:  # Likely a percentage
+            if kpi_value < 1 and kpi_value > 0:
                 value_str = f"{kpi_value:.1%}"
             else:
                 value_str = f"{kpi_value:,.2f}"
@@ -71,7 +68,7 @@ class ExecutiveBot:
             elif self.personality["ambition"] > 0.8:
                 comments.append(" (wants even higher targets)")
         
-        else:  # on target
+        else:
             if self.personality["friendliness"] > 0.7:
                 comments.append(" (satisfied with team performance)")
         
@@ -141,7 +138,6 @@ class BoardRoom:
 def load_agent_config(config_file: str = "config/agent_config.json") -> Dict:
     """Load agent configuration from JSON file."""
     
-    # Default configuration if file doesn't exist
     default_config = {
         "CFO": {
             "kpi": "accumulated_profit",
@@ -169,6 +165,24 @@ def load_agent_config(config_file: str = "config/agent_config.json") -> Dict:
                 "friendliness": 0.7,
                 "ambition": 0.7
             }
+        },
+        "IT_Manager": {
+            "kpi": "compromised_systems",
+            "target": {"max": 8},
+            "personality": {
+                "risk_tolerance": 0.25,
+                "friendliness": 0.6,
+                "ambition": 0.7
+            }
+        },
+        "CHRO": {
+            "kpi": "systems_availability",
+            "target": {"min": 0.93},
+            "personality": {
+                "risk_tolerance": 0.4,
+                "friendliness": 0.75,
+                "ambition": 0.65
+            }
         }
     }
     
@@ -177,7 +191,6 @@ def load_agent_config(config_file: str = "config/agent_config.json") -> Dict:
             with open(config_file, 'r') as f:
                 config = json.load(f)
             
-            # Handle different config structures
             if 'agents' in config:
                 config = config['agents']
             
@@ -196,7 +209,7 @@ def save_agent_config(config: Dict, config_file: str = "config/agent_config.json
     with open(config_file, 'w') as f:
         json.dump({"agents": config}, f, indent=2)
     
-    print(f"✓ Saved agent configuration to {config_file}")
+    print(f"Saved agent configuration to {config_file}")
 
 
 if __name__ == '__main__':
@@ -207,7 +220,7 @@ if __name__ == '__main__':
     # Load configuration
     config = load_agent_config()
     
-    print("\n📋 Agent Configuration:")
+    print("\nAgent Configuration:")
     for name, settings in config.items():
         print(f"\n{name}:")
         print(f"  KPI: {settings['kpi']}")
@@ -218,7 +231,7 @@ if __name__ == '__main__':
             print(f"    {trait:20s}: {bar} {value:.2f}")
     
     # Create agents
-    print("\n🤖 Creating Agents:")
+    print("\nCreating Agents:")
     agents = []
     for name, settings in config.items():
         agent = ExecutiveBot(
@@ -228,10 +241,10 @@ if __name__ == '__main__':
             personality=settings['personality']
         )
         agents.append(agent)
-        print(f"  ✓ {name}")
+        print(f"  {name}")
     
     # Test with sample data
-    print("\n📊 Testing with Sample Data:")
+    print("\nTesting with Sample Data:")
     sample_run = {
         "accumulated_profit": 1500000,
         "compromised_systems": 8,
@@ -243,11 +256,11 @@ if __name__ == '__main__':
     
     print("\nEvaluations:")
     for comment in feedback:
-        print(f"  • {comment}")
+        print(f"  {comment}")
     
     print("\nRecommendations:")
     recommendations = board.negotiate_strategy(sample_run)
     for rec in recommendations:
-        print(f"  • {rec}")
+        print(f"  {rec}")
     
     print(f"\nBoard Dynamics: {board.simulate_interaction('collaborative')}")

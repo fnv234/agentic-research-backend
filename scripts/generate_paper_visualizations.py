@@ -1,15 +1,21 @@
 """
 Generate visualizations for paper explaining threshold setting and multi-agent framework.
+Uses 5 agents (CFO, CRO, COO, IT_Manager, CHRO) consistent with optimization and config.
 """
 
 import json
+import os
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.patches import Rectangle
 import seaborn as sns
 from scipy import stats
-import os
+
+# Run from repo root so app is importable
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Set style
 sns.set_style("whitegrid")
@@ -20,16 +26,68 @@ plt.rcParams['font.size'] = 11
 os.makedirs('outputs/paper_figures', exist_ok=True)
 
 def load_simulation_data():
-    """Load simulation results."""
-    with open('simulation_data.json', 'r') as f:
-        data = json.load(f)
-    return list(data.values())
+    """Load simulation results from simulation_data.json, or fallback to optimization_results / sim_data."""
+    if os.path.exists('simulation_data.json'):
+        with open('simulation_data.json', 'r') as f:
+            data = json.load(f)
+        runs = list(data.values()) if isinstance(data, dict) else data
+        if runs and isinstance(runs[0], dict) and 'accumulated_profit' in runs[0]:
+            return runs
+    # Fallback: build from optimization results (first scenario, first config, years)
+    opt_path = 'outputs/multi_agent_optimization/optimization_results.json'
+    if os.path.exists(opt_path):
+        with open(opt_path, 'r') as f:
+            opt = json.load(f)
+        runs = []
+        for scenario, configs in opt.items():
+            for config_name, config_data in configs.items():
+                for y in config_data.get('years_summary', [])[:5]:
+                    comp = float(y.get('compromised', 0) or 0)
+                    profit = float(y.get('profit', 0) or 0)
+                    risk = float(y.get('systems_at_risk', 0) or 0)
+                    runs.append({
+                        'accumulated_profit': profit,
+                        'compromised_systems': comp,
+                        'systems_availability': min(1.0, max(0, 1.0 - comp / 100)),
+                        'systems_at_risk': risk,
+                        'strategy': f"{scenario}_{config_name}_y{y.get('year', 0)}",
+                        'F1': float(y.get('F1', 25) or 25), 'F2': float(y.get('F2', 25) or 25),
+                        'F3': float(y.get('F3', 25) or 25), 'F4': float(y.get('F4', 25) or 25)
+                    })
+        if runs:
+            return runs
+    # Fallback: minimal from sim_data.csv if present
+    csv_path = 'data/sim_data.csv'
+    if os.path.exists(csv_path):
+        import pandas as pd
+        df = pd.read_csv(csv_path)
+        if 'Cum. Profits' in df.columns:
+            df['Cum. Profits'] = pd.to_numeric(df['Cum. Profits'].astype(str).str.replace(',', ''), errors='coerce')
+        runs = []
+        for i, row in df.head(50).iterrows():
+            raw_profit = row.get('Cum. Profits', 0)
+            profit = (float(raw_profit) * 1000) if raw_profit is not None and str(raw_profit).strip() else 0
+            comp = float(row.get('Comp. Systems', 0) or 0)
+            runs.append({
+                'accumulated_profit': profit,
+                'compromised_systems': comp,
+                'systems_availability': max(0, min(1.0, 1.0 - comp / 100)),
+                'systems_at_risk': max(0, comp + 5),
+                'strategy': f"Run_{i+1}",
+                'F1': 30, 'F2': 30, 'F3': 25, 'F4': 15
+            })
+        return runs
+    raise FileNotFoundError("No simulation_data.json, optimization_results.json, or data/sim_data.csv found. Run multi_agent_optimization.py or generate_dashboard_data.py first.")
 
 def load_agent_config():
-    """Load agent configuration."""
-    with open('config/agent_config.json', 'r') as f:
-        config = json.load(f)
-    return config['agents']
+    """Load agent configuration from config file or app default (5 agents)."""
+    config_path = 'config/agent_config.json'
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+        return config.get('agents', config)
+    from app.agents import load_agent_config as app_load
+    return app_load()
 
 def figure1_threshold_setting_methodology():
     """Figure 1: Threshold Setting Methodology"""
@@ -115,89 +173,69 @@ def figure1_threshold_setting_methodology():
     
     plt.tight_layout()
     plt.savefig('outputs/paper_figures/figure1_threshold_methodology.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: figure1_threshold_methodology.png")
+    print("Saved figure1_threshold_methodology.png")
     plt.close()
 
 def figure2_agent_evaluation_framework():
-    """Figure 2: Multi-Agent Evaluation Framework"""
-    fig = plt.figure(figsize=(16, 10))
-    gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
-    
-    fig.suptitle('Multi-Agent Evaluation Framework: Decision-Making Process', 
-                 fontsize=16, fontweight='bold', y=0.98)
-    
-    # Main flow diagram
-    ax_main = fig.add_subplot(gs[0:2, 0:3])
-    ax_main.axis('off')
-    
-    # Draw flow
-    boxes = [
-        ('Simulation\nResults', 0.1, 0.7, 'lightblue'),
-        ('CFO\nEvaluation', 0.3, 0.7, 'lightgreen'),
-        ('CRO\nEvaluation', 0.5, 0.7, 'lightcoral'),
-        ('COO\nEvaluation', 0.7, 0.7, 'lightyellow'),
-        ('Agent\nConsensus', 0.9, 0.7, 'lightgray'),
-        ('Recommendations', 0.5, 0.3, 'lightpink')
-    ]
-    
-    for label, x, y, color in boxes:
-        rect = Rectangle((x-0.08, y-0.1), 0.16, 0.2, 
-                        facecolor=color, edgecolor='black', linewidth=2)
-        ax_main.add_patch(rect)
-        ax_main.text(x, y, label, ha='center', va='center', 
-                    fontweight='bold', fontsize=10)
-    
-    # Arrows
-    arrows = [
-        (0.18, 0.7, 0.22, 0.7),
-        (0.38, 0.7, 0.42, 0.7),
-        (0.58, 0.7, 0.62, 0.7),
-        (0.78, 0.7, 0.82, 0.7),
-        (0.5, 0.6, 0.5, 0.4)
-    ]
-    
-    for x1, y1, x2, y2 in arrows:
-        ax_main.annotate('', xy=(x2, y2), xytext=(x1, y1),
-                        arrowprops=dict(arrowstyle='->', lw=2, color='black'))
-    
-    # Agent details
+    """Figure 2: Multi-Agent Evaluation Framework (5 agents)"""
     agents = load_agent_config()
-    
-    # CFO details
-    ax_cfo = fig.add_subplot(gs[2, 0])
-    ax_cfo.axis('off')
-    cfo = agents['CFO']
-    ax_cfo.text(0.5, 0.9, 'CFO', ha='center', fontsize=12, fontweight='bold')
-    ax_cfo.text(0.1, 0.7, f"KPI: {cfo['kpi']}", fontsize=9)
-    ax_cfo.text(0.1, 0.5, f"Target: ≥ ${cfo['target']['min']:,.0f}", fontsize=9)
-    ax_cfo.text(0.1, 0.3, f"Risk Tolerance: {cfo['personality']['risk_tolerance']:.1f}", fontsize=9)
-    ax_cfo.text(0.1, 0.1, f"Ambition: {cfo['personality']['ambition']:.1f}", fontsize=9)
-    ax_cfo.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor='green', linewidth=2))
-    
-    # CRO details
-    ax_cro = fig.add_subplot(gs[2, 1])
-    ax_cro.axis('off')
-    cro = agents['CRO']
-    ax_cro.text(0.5, 0.9, 'CRO', ha='center', fontsize=12, fontweight='bold')
-    ax_cro.text(0.1, 0.7, f"KPI: {cro['kpi']}", fontsize=9)
-    ax_cro.text(0.1, 0.5, f"Target: ≤ {cro['target']['max']}", fontsize=9)
-    ax_cro.text(0.1, 0.3, f"Risk Tolerance: {cro['personality']['risk_tolerance']:.1f}", fontsize=9)
-    ax_cro.text(0.1, 0.1, f"Ambition: {cro['personality']['ambition']:.1f}", fontsize=9)
-    ax_cro.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor='red', linewidth=2))
-    
-    # COO details
-    ax_coo = fig.add_subplot(gs[2, 2])
-    ax_coo.axis('off')
-    coo = agents['COO']
-    ax_coo.text(0.5, 0.9, 'COO', ha='center', fontsize=12, fontweight='bold')
-    ax_coo.text(0.1, 0.7, f"KPI: {coo['kpi']}", fontsize=9)
-    ax_coo.text(0.1, 0.5, f"Target: ≥ {coo['target']['min']:.2f}", fontsize=9)
-    ax_coo.text(0.1, 0.3, f"Risk Tolerance: {coo['personality']['risk_tolerance']:.1f}", fontsize=9)
-    ax_coo.text(0.1, 0.1, f"Ambition: {coo['personality']['ambition']:.1f}", fontsize=9)
-    ax_coo.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor='blue', linewidth=2))
-    
-    plt.savefig('outputs/paper_figures/figure2_agent_framework.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: figure2_agent_framework.png")
+    agent_names = [a for a in ['CFO', 'CRO', 'COO', 'IT_Manager', 'CHRO'] if a in agents]
+    n_agents = len(agent_names)
+    if n_agents == 0:
+        agent_names = list(agents.keys())[:5]
+        n_agents = len(agent_names)
+
+    fig = plt.figure(figsize=(16, 10))
+    n_cols = min(5, n_agents)
+    gs = fig.add_gridspec(3, n_cols, hspace=0.35, wspace=0.25)
+    fig.suptitle('Multi-Agent Evaluation Framework: Decision-Making Process (5 Agents)', 
+                 fontsize=16, fontweight='bold', y=0.98)
+
+    ax_main = fig.add_subplot(gs[0:2, :])
+    ax_main.axis('off')
+    ax_main.set_xlim(0, 1)
+    ax_main.set_ylim(0, 1)
+    # Fixed positions so all boxes fit (Consensus not cut off): 7 top boxes in [0.06, 0.88]
+    n_top = n_agents + 2  # Simulation + agents + Consensus
+    xs = np.linspace(0.06, 0.88, n_top)
+    box_w = 0.10
+    colors_flow = ['lightblue', 'lightgreen', 'lightcoral', 'lightyellow', 'lavender', 'lavender', 'lightgray']
+    boxes = [('Simulation\nResults', xs[0], 0.7, colors_flow[0])]
+    for i, name in enumerate(agent_names):
+        boxes.append((f'{name}\nEval', xs[i + 1], 0.7, colors_flow[(i + 1) % len(colors_flow)]))
+    boxes.append(('Agent\nConsensus', xs[n_top - 1], 0.7, 'lightgray'))
+    boxes.append(('Recommendations', 0.5, 0.3, 'lightpink'))
+    for label, x, y, color in boxes:
+        w = box_w if 'Recommendations' not in label else 0.18
+        h = 0.18 if 'Recommendations' not in label else 0.14
+        rect = Rectangle((x - w/2, y - h/2), w, h, facecolor=color, edgecolor='black', linewidth=2)
+        ax_main.add_patch(rect)
+        ax_main.text(x, y, label, ha='center', va='center', fontweight='bold', fontsize=8)
+    for i in range(n_top - 1):
+        ax_main.annotate('', xy=(xs[i + 1] - box_w/2 - 0.01, 0.7), xytext=(xs[i] + box_w/2 + 0.01, 0.7),
+                         arrowprops=dict(arrowstyle='->', lw=2, color='black'))
+    ax_main.annotate('', xy=(0.5, 0.39), xytext=(0.5, 0.61),
+                     arrowprops=dict(arrowstyle='->', lw=2, color='black'))
+
+    # Agent detail panels (5 agents)
+    colors = ['green', 'red', 'blue', 'purple', 'orange']
+    for idx, name in enumerate(agent_names[:5]):
+        ax = fig.add_subplot(gs[2, idx % n_cols])
+        ax.axis('off')
+        a = agents[name]
+        ax.text(0.5, 0.9, name, ha='center', fontsize=11, fontweight='bold')
+        ax.text(0.1, 0.65, f"KPI: {a['kpi']}", fontsize=8)
+        t = a.get('target', {})
+        if 'min' in t:
+            ax.text(0.1, 0.45, f"Target: ≥ {t['min']:,.0f}" if t['min'] > 100 else f"Target: ≥ {t['min']:.2f}", fontsize=8)
+        else:
+            ax.text(0.1, 0.45, f"Target: ≤ {t.get('max', '')}", fontsize=8)
+        ax.text(0.1, 0.25, f"Risk Tol: {a['personality']['risk_tolerance']:.2f}", fontsize=8)
+        ax.text(0.1, 0.05, f"Ambition: {a['personality']['ambition']:.2f}", fontsize=8)
+        ax.add_patch(Rectangle((0, 0), 1, 1, fill=False, edgecolor=colors[idx % len(colors)], linewidth=2))
+
+    plt.savefig('outputs/paper_figures/figure2_agent_framework_example.png', dpi=300, bbox_inches='tight')
+    print("Saved figure2_agent_framework_example.png")
     plt.close()
 
 def figure3_threshold_impact_analysis():
@@ -270,64 +308,67 @@ def figure3_threshold_impact_analysis():
     ax.legend()
     ax.grid(True, alpha=0.3)
     
-    # Combined: Agent agreement vs threshold strictness
+    # Combined: Agent agreement vs threshold strictness (5 agents when in config)
     ax = axes[1, 1]
-    # Simulate different threshold strictness levels
     strictness_levels = np.linspace(0.5, 1.5, 20)
     agreement_rates = []
-    
+    n_agents = 3
+    if 'IT_Manager' in agents:
+        it_target = agents['IT_Manager']['target'].get('max', 8)
+        n_agents += 1
+    if 'CHRO' in agents:
+        chro_target = agents['CHRO']['target'].get('min', 0.93)
+        n_agents += 1
+    def run_meets_all(r, cfo_adj, cro_adj, coo_adj):
+        if not (r['accumulated_profit'] >= cfo_adj and r['compromised_systems'] <= cro_adj and r['systems_availability'] >= coo_adj):
+            return False
+        if 'IT_Manager' in agents and r['compromised_systems'] > agents['IT_Manager']['target'].get('max', 8):
+            return False
+        if 'CHRO' in agents and r['systems_availability'] < agents['CHRO']['target'].get('min', 0.93):
+            return False
+        return True
+
     for strictness in strictness_levels:
-        # Adjust thresholds
         cfo_adj = np.mean(profits) + strictness * 0.5 * np.std(profits)
         cro_adj = max(0, np.mean(compromised) - strictness * 0.5 * np.std(compromised))
         coo_adj = min(1.0, np.mean(availability) + strictness * 0.3 * np.std(availability))
-        
-        # Count runs that meet all thresholds
-        meets_all = sum(1 for r in runs 
-                       if r['accumulated_profit'] >= cfo_adj and
-                          r['compromised_systems'] <= cro_adj and
-                          r['systems_availability'] >= coo_adj)
-        agreement_rates.append(meets_all / len(runs) * 100)
+        count_meets = sum(1 for r in runs if run_meets_all(r, cfo_adj, cro_adj, coo_adj))
+        agreement_rates.append(count_meets / len(runs) * 100)
     
     ax.plot(strictness_levels, agreement_rates, 'purple', linewidth=2, marker='o')
     ax.axvline(1.0, color='red', linestyle='--', linewidth=2, 
                label='Current Setting (1.0)')
     ax.set_xlabel('Threshold Strictness Multiplier', fontweight='bold')
     ax.set_ylabel('% of Runs Meeting All Targets', fontweight='bold')
-    ax.set_title('Multi-Agent Agreement Rate\nvs Threshold Strictness', fontweight='bold')
+    ax.set_title(f'Multi-Agent Agreement Rate ({n_agents} Agents)\nvs Threshold Strictness', fontweight='bold')
     ax.legend()
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
     plt.savefig('outputs/paper_figures/figure3_threshold_impact.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: figure3_threshold_impact.png")
+    print("Saved figure3_threshold_impact.png")
     plt.close()
 
 def figure4_personality_impact():
-    """Figure 4: Personality Traits Impact on Recommendations"""
+    """Figure 4: Personality Traits Impact on Recommendations (5 agents)"""
     agents = load_agent_config()
+    agent_names = [a for a in ['CFO', 'CRO', 'COO', 'IT_Manager', 'CHRO'] if a in agents]
+    if not agent_names:
+        agent_names = list(agents.keys())
     
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    fig.suptitle('Personality Traits Impact on Agent Behavior', 
+    fig.suptitle('Personality Traits Impact on Agent Behavior (5 Agents)', 
                  fontsize=16, fontweight='bold')
     
-    # Extract personality data
-    agent_names = []
-    risk_tolerance = []
-    friendliness = []
-    ambition = []
+    risk_tolerance = [agents[n]['personality']['risk_tolerance'] for n in agent_names]
+    friendliness = [agents[n]['personality']['friendliness'] for n in agent_names]
+    ambition = [agents[n]['personality']['ambition'] for n in agent_names]
     
-    for name, config in agents.items():
-        if name not in ['IT_Manager', 'CHRO', 'COO_Business']:  # Focus on main 3
-            agent_names.append(name)
-            risk_tolerance.append(config['personality']['risk_tolerance'])
-            friendliness.append(config['personality']['friendliness'])
-            ambition.append(config['personality']['ambition'])
+    bar_colors = ['green', 'red', 'blue', 'purple', 'orange'][:len(agent_names)]
     
     # Risk Tolerance
     ax = axes[0]
-    colors = ['green', 'red', 'blue']
-    bars = ax.bar(agent_names, risk_tolerance, color=colors, alpha=0.7, edgecolor='black')
+    bars = ax.bar(agent_names, risk_tolerance, color=bar_colors, alpha=0.7, edgecolor='black')
     ax.set_ylabel('Risk Tolerance (0-1)', fontweight='bold')
     ax.set_title('Risk Tolerance Levels', fontweight='bold')
     ax.set_ylim(0, 1)
@@ -338,7 +379,7 @@ def figure4_personality_impact():
     
     # Friendliness
     ax = axes[1]
-    bars = ax.bar(agent_names, friendliness, color=colors, alpha=0.7, edgecolor='black')
+    bars = ax.bar(agent_names, friendliness, color=bar_colors, alpha=0.7, edgecolor='black')
     ax.set_ylabel('Friendliness (0-1)', fontweight='bold')
     ax.set_title('Collaborative Tendency', fontweight='bold')
     ax.set_ylim(0, 1)
@@ -349,7 +390,7 @@ def figure4_personality_impact():
     
     # Ambition
     ax = axes[2]
-    bars = ax.bar(agent_names, ambition, color=colors, alpha=0.7, edgecolor='black')
+    bars = ax.bar(agent_names, ambition, color=bar_colors, alpha=0.7, edgecolor='black')
     ax.set_ylabel('Ambition (0-1)', fontweight='bold')
     ax.set_title('Performance Drive', fontweight='bold')
     ax.set_ylim(0, 1)
@@ -359,253 +400,129 @@ def figure4_personality_impact():
                f'{val:.2f}', ha='center', fontweight='bold')
     
     plt.tight_layout()
-    plt.savefig('outputs/paper_figures/figure4_personality_impact.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: figure4_personality_impact.png")
+    plt.savefig('outputs/paper_figures/personality_comparison_three_agents.png', dpi=300, bbox_inches='tight')
+    print("Saved personality_comparison_three_agents.png (5 agents)")
     plt.close()
 
 def figure5_strategy_evaluation():
-    """Figure 5: Strategy Evaluation Across Agents"""
+    """Figure 5: Strategy Evaluation (5 agents) – meaningful target summary, trade-off, consensus dist, budget per agent."""
     runs = load_simulation_data()
     agents = load_agent_config()
-    
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle('Strategy Evaluation: Multi-Agent Perspective', 
-                 fontsize=16, fontweight='bold')
-    
-    # Extract strategy data
-    strategies = [r['strategy'] for r in runs]
+    agent_list = [a for a in ['CFO', 'CRO', 'COO', 'IT_Manager', 'CHRO'] if a in agents]
+    if not agent_list:
+        agent_list = list(agents.keys())
+    n_ag = len(agent_list)
+
     profits = [r['accumulated_profit'] for r in runs]
     compromised = [r['compromised_systems'] for r in runs]
     availability = [r['systems_availability'] for r in runs]
-    
-    # Agent evaluations (meet target or not)
-    cfo_target = agents['CFO']['target']['min']
-    cro_target = agents['CRO']['target']['max']
-    coo_target = agents['COO']['target']['min']
-    
+    cfo_target = agents.get('CFO', {}).get('target', {}).get('min', 1200000)
+    cro_target = agents.get('CRO', {}).get('target', {}).get('max', 10)
+    coo_target = agents.get('COO', {}).get('target', {}).get('min', 0.92)
+    it_target = agents.get('IT_Manager', {}).get('target', {}).get('max', 8)
+    chro_target = agents.get('CHRO', {}).get('target', {}).get('min', 0.93)
     cfo_meets = [1 if p >= cfo_target else 0 for p in profits]
     cro_meets = [1 if c <= cro_target else 0 for c in compromised]
     coo_meets = [1 if a >= coo_target else 0 for a in availability]
-    
-    # Strategy ranking by each agent
+    it_meets = [1 if c <= it_target else 0 for c in compromised]
+    chro_meets = [1 if a >= chro_target else 0 for a in availability]
+    consensus_scores = [cfo_meets[i] + cro_meets[i] + coo_meets[i] + it_meets[i] + chro_meets[i] for i in range(len(runs))]
+    meets_list = [cfo_meets, cro_meets, coo_meets, it_meets, chro_meets]
+    colors_ag = ['green', 'red', 'blue', 'purple', 'orange']
+
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    fig.suptitle('Strategy Evaluation: Multi-Agent Perspective (5 Agents)', fontsize=16, fontweight='bold')
+
+    # Top-left: Share of runs meeting each agent's target (5 bars, one per agent)
     ax = axes[0, 0]
-    strategy_indices = list(range(len(strategies)))
-    width = 0.25
-    x = np.arange(len(strategies))
-    
-    ax.bar(x - width, cfo_meets, width, label='CFO Meets Target', color='green', alpha=0.7)
-    ax.bar(x, cro_meets, width, label='CRO Meets Target', color='red', alpha=0.7)
-    ax.bar(x + width, coo_meets, width, label='COO Meets Target', color='blue', alpha=0.7)
-    
-    ax.set_xlabel('Strategy', fontweight='bold')
-    ax.set_ylabel('Meets Target (1) or Not (0)', fontweight='bold')
-    ax.set_title('Agent Target Achievement by Strategy', fontweight='bold')
-    ax.set_xticks(x)
-    ax.set_xticklabels([s[:15] for s in strategies], rotation=45, ha='right')
-    ax.legend()
+    pct_meets = [100 * np.mean(m) for m in meets_list[:n_ag]]
+    bars = ax.bar(agent_list, pct_meets, color=colors_ag[:n_ag], alpha=0.7, edgecolor='black')
+    ax.set_ylabel('% of Runs Meeting Target', fontweight='bold')
+    ax.set_title('Target Achievement by Agent', fontweight='bold')
+    ax.set_ylim(0, 105)
+    ax.axhline(50, color='gray', linestyle=':', alpha=0.7)
+    for bar, pct in zip(bars, pct_meets):
+        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2, f'{pct:.0f}%', ha='center', fontsize=9)
     ax.grid(True, alpha=0.3, axis='y')
-    
-    # Pareto front: Profit vs Compromised Systems
+
+    # Top-right: Trade-off analysis (keep as requested)
     ax = axes[0, 1]
-    scatter = ax.scatter(compromised, profits, c=availability, 
-                        s=100, alpha=0.7, cmap='viridis', edgecolors='black')
-    
-    # Highlight strategies that meet all targets
-    all_meet = [i for i in range(len(runs)) 
-                if cfo_meets[i] and cro_meets[i] and coo_meets[i]]
+    scatter = ax.scatter(compromised, profits, c=availability, s=80, alpha=0.7, cmap='viridis', edgecolors='black')
+    all_meet = [i for i in range(len(runs)) if all(meets_list[j][i] for j in range(n_ag))]
     if all_meet:
-        ax.scatter([compromised[i] for i in all_meet], 
-                  [profits[i] for i in all_meet],
-                  s=200, marker='*', color='gold', edgecolors='black', 
-                  linewidth=2, label='Meets All Targets', zorder=5)
-    
+        ax.scatter([compromised[i] for i in all_meet], [profits[i] for i in all_meet],
+                   s=180, marker='*', color='gold', edgecolors='black', linewidth=2, label='Meets All Targets', zorder=5)
     ax.set_xlabel('Compromised Systems', fontweight='bold')
     ax.set_ylabel('Accumulated Profit ($)', fontweight='bold')
-    ax.set_title('Trade-off Analysis: Security vs Profit\n(Color = Availability)', fontweight='bold')
+    ax.set_title('Trade-off: Security vs Profit\n(Color = Availability)', fontweight='bold')
     plt.colorbar(scatter, ax=ax, label='Systems Availability')
     ax.legend()
     ax.grid(True, alpha=0.3)
-    
-    # Agent consensus score
+
+    # Bottom-left: Consensus distribution (how many runs got 0, 1, 2, 3, 4, 5 approvals)
     ax = axes[1, 0]
-    consensus_scores = [cfo_meets[i] + cro_meets[i] + coo_meets[i] for i in range(len(runs))]
-    ax.barh(strategies, consensus_scores, color='purple', alpha=0.7, edgecolor='black')
+    bins = np.arange(-0.5, n_ag + 1.5, 1)
+    ax.hist(consensus_scores, bins=bins, color='purple', alpha=0.7, edgecolor='black', align='mid')
     ax.set_xlabel('Number of Agents Approving', fontweight='bold')
-    ax.set_title('Agent Consensus Score\n(Out of 3 Agents)', fontweight='bold')
-    ax.set_xlim(0, 3.5)
-    ax.grid(True, alpha=0.3, axis='x')
-    
-    # F1-F4 budget allocation comparison
-    ax = axes[1, 1]
-    f1_vals = [r['F1'] for r in runs]
-    f2_vals = [r['F2'] for r in runs]
-    f3_vals = [r['F3'] for r in runs]
-    f4_vals = [r['F4'] for r in runs]
-    
-    x = np.arange(len(strategies))
-    width = 0.2
-    ax.bar(x - 1.5*width, f1_vals, width, label='F1: Prevention', color='green', alpha=0.7)
-    ax.bar(x - 0.5*width, f2_vals, width, label='F2: Detection', color='blue', alpha=0.7)
-    ax.bar(x + 0.5*width, f3_vals, width, label='F3: Response', color='orange', alpha=0.7)
-    ax.bar(x + 1.5*width, f4_vals, width, label='F4: Recovery', color='red', alpha=0.7)
-    
-    ax.set_xlabel('Strategy', fontweight='bold')
-    ax.set_ylabel('Budget Allocation (%)', fontweight='bold')
-    ax.set_title('Budget Allocation (F1-F4) by Strategy', fontweight='bold')
-    ax.set_xticks(x)
-    ax.set_xticklabels([s[:15] for s in strategies], rotation=45, ha='right')
-    ax.legend()
+    ax.set_ylabel('Number of Runs', fontweight='bold')
+    ax.set_title(f'Consensus Distribution (Out of {n_ag} Agents)', fontweight='bold')
+    ax.set_xticks(range(n_ag + 1))
     ax.grid(True, alpha=0.3, axis='y')
-    
+
+    # Bottom-right: Budget allocation (F1–F4) per agent – avg when agent target met vs not met
+    ax = axes[1, 1]
+    f1 = [r.get('F1', 25) for r in runs]
+    f2 = [r.get('F2', 25) for r in runs]
+    f3 = [r.get('F3', 25) for r in runs]
+    f4 = [r.get('F4', 25) for r in runs]
+    x = np.arange(n_ag)
+    width = 0.35
+    # For each agent: avg F1 when met vs not met (two bars per agent)
+    met_avg_f1, notmet_avg_f1 = [], []
+    met_avg_f2, notmet_avg_f2 = [], []
+    met_avg_f3, notmet_avg_f3 = [], []
+    met_avg_f4, notmet_avg_f4 = [], []
+    for m in meets_list[:n_ag]:
+        met_idx = [i for i in range(len(runs)) if m[i]]
+        not_idx = [i for i in range(len(runs)) if not m[i]]
+        met_avg_f1.append(np.mean([f1[i] for i in met_idx]) if met_idx else 0)
+        notmet_avg_f1.append(np.mean([f1[i] for i in not_idx]) if not_idx else 0)
+        met_avg_f2.append(np.mean([f2[i] for i in met_idx]) if met_idx else 0)
+        notmet_avg_f2.append(np.mean([f2[i] for i in not_idx]) if not_idx else 0)
+        met_avg_f3.append(np.mean([f3[i] for i in met_idx]) if met_idx else 0)
+        notmet_avg_f3.append(np.mean([f3[i] for i in not_idx]) if not_idx else 0)
+        met_avg_f4.append(np.mean([f4[i] for i in met_idx]) if met_idx else 0)
+        notmet_avg_f4.append(np.mean([f4[i] for i in not_idx]) if not_idx else 0)
+    # Stacked bars: "Target met" (left) vs "Target not met" (right) per agent; each bar = F1+F2+F3+F4
+    for i in range(n_ag):
+        ax.bar(x[i] - width/2, met_avg_f1[i], width/2, label='F1' if i == 0 else None, color='green', alpha=0.8)
+        ax.bar(x[i] - width/2, met_avg_f2[i], width/2, bottom=met_avg_f1[i], label='F2' if i == 0 else None, color='blue', alpha=0.8)
+        ax.bar(x[i] - width/2, met_avg_f3[i], width/2, bottom=np.array(met_avg_f1)[i]+np.array(met_avg_f2)[i], label='F3' if i == 0 else None, color='orange', alpha=0.8)
+        ax.bar(x[i] - width/2, met_avg_f4[i], width/2, bottom=np.array(met_avg_f1)[i]+np.array(met_avg_f2)[i]+np.array(met_avg_f3)[i], label='F4' if i == 0 else None, color='red', alpha=0.8)
+        ax.bar(x[i], notmet_avg_f1[i], width/2, color='green', alpha=0.4)
+        ax.bar(x[i], notmet_avg_f2[i], width/2, bottom=notmet_avg_f1[i], color='blue', alpha=0.4)
+        ax.bar(x[i], notmet_avg_f3[i], width/2, bottom=np.array(notmet_avg_f1)[i]+np.array(notmet_avg_f2)[i], color='orange', alpha=0.4)
+        ax.bar(x[i], notmet_avg_f4[i], width/2, bottom=np.array(notmet_avg_f1)[i]+np.array(notmet_avg_f2)[i]+np.array(notmet_avg_f3)[i], color='red', alpha=0.4)
+    ax.set_xticks(x)
+    ax.set_xticklabels(agent_list, rotation=25, ha='right')
+    ax.set_ylabel('Avg F1–F4 Allocation (%)', fontweight='bold')
+    ax.set_title('Budget Allocation by Agent: Target Met (left) vs Not Met (right)', fontweight='bold')
+    from matplotlib.patches import Patch
+    ax.legend(handles=[Patch(facecolor='green', alpha=0.8, label='F1'), Patch(facecolor='blue', alpha=0.8, label='F2'),
+                      Patch(facecolor='orange', alpha=0.8, label='F3'), Patch(facecolor='red', alpha=0.8, label='F4')],
+             loc='upper right', ncol=2)
+    ax.grid(True, alpha=0.3, axis='y')
+
     plt.tight_layout()
-    plt.savefig('outputs/paper_figures/figure5_strategy_evaluation.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: figure5_strategy_evaluation.png")
+    plt.savefig('outputs/paper_figures/strategy_evaluation_mainagents.png', dpi=300, bbox_inches='tight')
+    print("Saved strategy_evaluation_mainagents.png (5 agents)")
     plt.close()
 
-def generate_summary_document():
-    """Generate a summary document explaining the visualizations."""
-    doc = """# Visualization Summary: Multi-Agent Framework for Cyber-Risk Management
-
-## Overview
-This document explains the visualizations generated to illustrate the multi-agent framework, threshold setting methodology, and evaluation process.
-
-## Figure 1: Threshold Setting Methodology
-**Purpose**: Demonstrates how thresholds are calibrated using data-driven approaches.
-
-**Key Elements**:
-- Histograms showing distribution of KPI values across simulation runs
-- Current threshold values (red dashed lines)
-- Statistical measures (mean, mean ± σ) used for calibration
-- Different threshold types: min thresholds (CFO, COO) and max thresholds (CRO)
-
-**Insights**:
-- CFO target ($1.2M) is set above mean to encourage high performance
-- CRO target (10 systems) is set below mean to minimize risk
-- COO target (0.92) ensures high availability standards
-- Thresholds are positioned to balance achievability with ambition
-
-## Figure 2: Multi-Agent Evaluation Framework
-**Purpose**: Illustrates the system architecture and decision-making flow.
-
-**Key Elements**:
-- Flow diagram showing simulation → agent evaluation → consensus → recommendations
-- Agent specifications (KPI focus, targets, personality traits)
-- Integration points between components
-
-**Insights**:
-- Each agent independently evaluates results based on their KPI
-- Personality traits influence recommendation style
-- Consensus emerges from individual agent evaluations
-
-## Figure 3: Threshold Impact Analysis
-**Purpose**: Shows sensitivity of agent evaluations to threshold changes.
-
-**Key Elements**:
-- Sensitivity curves showing % of runs meeting targets at different threshold levels
-- Current threshold positions
-- Multi-agent agreement rate vs threshold strictness
-
-**Insights**:
-- Stricter thresholds reduce number of acceptable strategies
-- Optimal threshold setting balances individual agent goals with overall consensus
-- Too strict thresholds lead to no strategies meeting all targets
-
-## Figure 4: Personality Traits Impact
-**Purpose**: Visualizes personality trait differences across agents.
-
-**Key Elements**:
-- Risk tolerance: CRO is most risk-averse, COO is moderate
-- Friendliness: COO is most collaborative
-- Ambition: CFO is most ambitious, driving for higher targets
-
-**Insights**:
-- Personality traits create diverse perspectives
-- Risk tolerance directly affects recommendation aggressiveness
-- Ambition level influences target setting and evaluation
-
-## Figure 5: Strategy Evaluation
-**Purpose**: Shows how different strategies perform from multi-agent perspective.
-
-**Key Elements**:
-- Target achievement by strategy for each agent
-- Trade-off analysis (security vs profit vs availability)
-- Consensus scores showing strategies approved by multiple agents
-- Budget allocation patterns (F1-F4)
-
-**Insights**:
-- No single strategy dominates across all KPIs
-- Strategies that meet all targets are rare (gold stars)
-- Budget allocation patterns correlate with performance
-- Prevention-heavy strategies tend to reduce compromised systems but may reduce profits
-
-## Threshold Setting Methodology
-
-### Data-Driven Approach
-1. **Collect Simulation Results**: Run multiple strategies and collect KPI values
-2. **Statistical Analysis**: Calculate mean, standard deviation, percentiles
-3. **Target Positioning**: 
-   - For maximize KPIs (profit, availability): Set at mean + k×σ (k=0.3-0.5)
-   - For minimize KPIs (compromised systems): Set at mean - k×σ (k=0.5)
-4. **Calibration**: Adjust based on organizational risk appetite
-
-### Domain Knowledge Integration
-- Industry benchmarks
-- Regulatory requirements
-- Organizational risk tolerance
-- Historical performance data
-
-### Threshold Types
-- **Min Thresholds**: For KPIs to maximize (profit ≥ $1.2M, availability ≥ 0.92)
-- **Max Thresholds**: For KPIs to minimize (compromised systems ≤ 10)
-
-## Agent Evaluation Process
-
-1. **KPI Extraction**: Extract relevant KPI value from simulation results
-2. **Threshold Comparison**: Compare KPI value against agent's target
-3. **Status Determination**: 
-   - Below target: KPI < min or KPI > max
-   - On target: min ≤ KPI ≤ max
-   - Above target: KPI > min (for maximize) or KPI < max (for minimize)
-4. **Recommendation Generation**: Personality-driven suggestions based on status
-
-## Personality-Driven Recommendations
-
-### Risk Tolerance Impact
-- **High (>0.7)**: Aggressive recommendations when below target
-- **Low (<0.3)**: Cautious, gradual improvements preferred
-
-### Ambition Impact
-- **High (>0.8)**: Pushes for optimization even when on target
-- **Low (<0.5)**: Satisfied with meeting targets
-
-### Friendliness Impact
-- **High (>0.7)**: Collaborative, satisfied with team performance
-- **Low (<0.5)**: More critical, pushes for individual excellence
-
-## Key Findings
-
-1. **Threshold Calibration**: Data-driven approach provides objective, defensible thresholds
-2. **Multi-Agent Perspective**: Captures diverse stakeholder viewpoints
-3. **Trade-offs**: No single strategy dominates; framework helps identify Pareto-optimal solutions
-4. **Personality Impact**: Traits significantly influence recommendation style and target setting
-5. **Consensus Building**: Framework enables identification of strategies acceptable to multiple stakeholders
-
-## Applications
-
-- **Strategic Planning**: Evaluate budget allocation strategies before implementation
-- **Risk Assessment**: Understand trade-offs between security and business objectives
-- **Stakeholder Alignment**: Visualize how different perspectives evaluate same strategies
-- **Decision Support**: Data-driven recommendations with personality-driven nuance
-"""
-    
-    with open('outputs/paper_figures/visualization_summary.md', 'w') as f:
-        f.write(doc)
-    print("✅ Saved: visualization_summary.md")
 
 def main():
     """Generate all visualizations."""
     print("=" * 70)
-    print("📊 Generating Paper Visualizations")
+    print("Generating Paper Visualizations")
     print("=" * 70)
     
     print("\n1. Generating Figure 1: Threshold Setting Methodology...")
@@ -623,18 +540,9 @@ def main():
     print("\n5. Generating Figure 5: Strategy Evaluation...")
     figure5_strategy_evaluation()
     
-    print("\n6. Generating Summary Document...")
-    generate_summary_document()
-    
     print("\n" + "=" * 70)
-    print("✅ All visualizations generated!")
+    print("All visualizations generated!")
     print("=" * 70)
-    print("\n📁 Files saved to: outputs/paper_figures/")
-    print("\n📄 Paper outline saved to: PAPER_OUTLINE.md")
-    print("\n💡 Next steps:")
-    print("   - Review visualizations in outputs/paper_figures/")
-    print("   - Use figures in paper sections")
-    print("   - Reference PAPER_OUTLINE.md for structure")
 
 if __name__ == '__main__':
     main()

@@ -23,7 +23,6 @@ from multi_agent_demo_mock import ExecutiveBot, BoardRoom, generate_mock_runs
 
 OUTPUT_DIR = "outputs"
 
-# Default agent definitions (align with paper + earlier config)
 CFO = ExecutiveBot(
     "CFO",
     "accumulated_profit",
@@ -70,11 +69,9 @@ def load_dataset() -> pd.DataFrame:
             except Exception:
                 continue
     else:
-        # Fallback to mock
         data = generate_mock_runs(50)
         df = pd.DataFrame(data)
 
-    # Normalize types
     if "accumulated_profit" in df.columns:
         df["accumulated_profit"] = pd.to_numeric(df["accumulated_profit"], errors="coerce")
     if "compromised_systems" in df.columns:
@@ -119,7 +116,6 @@ def fleiss_kappa(matrix: np.ndarray) -> float:
 def evaluate_and_figure(df: pd.DataFrame):
     ensure_output_dir()
 
-    # Speed metric (proxy): time to evaluate all runs by 3 agents
     start = time.time()
     labels = []  # per-run, per-agent recommendation labels
     for _, row in df.iterrows():
@@ -133,7 +129,6 @@ def evaluate_and_figure(df: pd.DataFrame):
     elapsed = time.time() - start
     avg_ms_per_run = (elapsed / max(len(df), 1)) * 1000
 
-    # Agreement (Fleiss' kappa)
     cats = ["increase", "maintain", "decrease"]
     mat = []
     for lab3 in labels:
@@ -142,7 +137,6 @@ def evaluate_and_figure(df: pd.DataFrame):
     M = np.array(mat, dtype=float) if mat else np.zeros((0, 3))
     kappa = fleiss_kappa(M) if len(M) else 0.0
 
-    # Recommendation distribution per agent
     dist = {"CFO": {}, "CRO": {}, "COO": {}}
     for agent, name in zip([CFO, CRO, COO], ["CFO", "CRO", "COO"]):
         counts = {c: 0 for c in cats}
@@ -152,8 +146,6 @@ def evaluate_and_figure(df: pd.DataFrame):
                 counts[lab] += 1
         dist[name] = counts
 
-    # Figures
-    # 1) KPI histograms
     fig, axes = plt.subplots(1, 3, figsize=(14, 4))
     if "accumulated_profit" in df.columns:
         axes[0].hist(df["accumulated_profit"].dropna(), bins=20, color="#60a5fa", alpha=0.7)

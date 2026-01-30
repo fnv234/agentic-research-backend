@@ -97,7 +97,6 @@ def generate_summary_report(results: Dict) -> str:
             report.append(f"      Avg Compromised Systems: {comp:.2f}")
         report.append("")
     
-    # 3. Collaborative vs Uncollaborative Comparison
     report.append("COLLABORATIVE VS UNCOLLABORATIVE AGENTS")
     report.append("-" * 80)
     report.append("")
@@ -196,7 +195,7 @@ def main():
     with open(output_path, 'w') as f:
         f.write(report)
     
-    print(f"✅ Report saved to {output_path}")
+    print(f"Report saved to {output_path}")
     print("\n" + "=" * 80)
     print(report)
     print("=" * 80)

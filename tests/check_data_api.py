@@ -15,7 +15,7 @@ PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 FORIO_ORG = os.getenv("FORIO_ORG", "mitcams")
 FORIO_PROJECT = os.getenv("FORIO_PROJECT", "cyberriskmanagement-ransomeware-2023")
 
-# Get OAuth token
+# get oauth token
 creds = base64.b64encode(f"{PUBLIC_KEY}:{PRIVATE_KEY}".encode()).decode()
 headers = {
     "Content-Type": "application/x-www-form-urlencoded",
@@ -31,7 +31,7 @@ print("=" * 70)
 print("Checking Forio Data API for simulation results")
 print("=" * 70)
 
-# Try different Data API endpoints
+# try different data api endpoints
 collections = [
     "results",
     "simulation_results", 
@@ -73,12 +73,12 @@ for collection in collections:
     except Exception as e:
         print(f"  Exception: {e}")
 
-# Also check if there's a specific run data endpoint
+# check if there's a specific run data endpoint
 print(f"\n{'='*70}")
 print("Checking for run-specific data storage:")
 print(f"{'='*70}")
 
-# Get a run ID
+# get a run id
 url = f"https://forio.com/v2/run/{FORIO_ORG}/{FORIO_PROJECT}/;saved=true;trashed=false?startRecord=0&endRecord=1"
 resp = requests.get(url, headers=headers)
 runs = resp.json()
@@ -87,7 +87,7 @@ if runs:
     run_id = runs[0]['id']
     print(f"\nUsing run ID: {run_id}")
     
-    # Try to get data associated with this run
+    # try to get data associated with this run
     data_endpoints = [
         f"https://api.forio.com/v2/data/{FORIO_ORG}/{FORIO_PROJECT}/run/{run_id}",
         f"https://api.forio.com/v2/data/{FORIO_ORG}/{FORIO_PROJECT}?q=runId:{run_id}",

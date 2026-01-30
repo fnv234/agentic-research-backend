@@ -8,13 +8,6 @@ This directory contains the results of the comprehensive multi-agent optimizatio
   - Contains metrics for all scenarios and agent configurations
   - Includes year-by-year breakdown for each configuration
 
-- **SUMMARY_REPORT.txt**: Human-readable summary report
-  - Executive summary
-  - Primary results by scenario
-  - Collaborative vs uncollaborative comparison
-  - Risk tolerance variations
-  - Key findings
-
 - **ARCHITECTURE.md**: Detailed architecture documentation
   - System design
   - Agent framework
@@ -26,7 +19,11 @@ This directory contains the results of the comprehensive multi-agent optimizatio
 - **primary_results.png**: Profit and systems at risk by scenario and configuration
 - **collaborative_comparison.png**: Collaborative vs uncollaborative agents across scenarios
 - **risk_tolerance_comparison.png**: Low/medium/high risk tolerance across scenarios
-- **year_by_year_evolution.png**: 5-year progression for example scenario
+- **year_by_year_evolution.png**: 5-year progression for first scenario (backward compatibility)
+- **year_by_year_evolution_simple_deterministic.png**: 5-year evolution (simple deterministic threat)
+- **year_by_year_evolution_simple_unpredictable.png**: 5-year evolution (simple unpredictable threat)
+- **year_by_year_evolution_advanced_ransomware.png**: 5-year evolution (ransomware, no payment)
+- **year_by_year_evolution_advanced_ransomware_paid.png**: 5-year evolution (ransomware with payment)
 
 ## Scenarios Analyzed
 
@@ -45,6 +42,10 @@ This directory contains the results of the comprehensive multi-agent optimizatio
 4. **Advanced Attacks - Ransomware (With Payment)**
    - Ransomware attacks with ransom payment
    - Financial + operational impact
+
+## Agent Framework
+
+The optimization uses **five agents** (CFO, CRO, COO, IT_Manager, CHRO) with distinct KPIs and targets; see ARCHITECTURE.md for roles and allocation logic.
 
 ## Agent Configurations
 
