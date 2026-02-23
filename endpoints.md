@@ -18,6 +18,7 @@
 ## Simulation
 - `GET /api/scenarios` - List simulation scenarios
 - `POST /api/simulate` - Run multi-agent simulation
+- `POST /api/sensitivity` - Run sensitivity analysis (many sims, one graph); body: vary, steps?, scenario, agent_collaboration, risk_tolerance, num_years
 
 ## Thresholds (MongoDB)
 - `POST /api/thresholds` - Create threshold

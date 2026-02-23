@@ -389,6 +389,76 @@ def run_simulation():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/sensitivity', methods=['POST'])
+def run_sensitivity_analysis():
+    """
+    Run many simulations (sensitivity analysis) and return aggregated results for one graph.
+    Body: vary ('risk_tolerance' | 'scenario' | 'agent_collaboration'),
+          steps (list of values to vary),
+          scenario, agent_collaboration, risk_tolerance, num_years (fixed when not varied).
+    Returns: series list with x_value, final_profit, final_risk, avg_availability, label.
+    """
+    try:
+        data = request.json or {}
+        vary = data.get('vary', 'risk_tolerance')
+        steps = data.get('steps')
+        scenario = data.get('scenario', 'simple_deterministic')
+        agent_collaboration = data.get('agent_collaboration', 'collaborative')
+        risk_tolerance = data.get('risk_tolerance', 0.5)
+        num_years = data.get('num_years', 5)
+
+        if vary == 'risk_tolerance' and steps is None:
+            steps = [0, 0.25, 0.5, 0.75, 1.0]
+        elif vary == 'scenario' and steps is None:
+            steps = ['simple_deterministic', 'simple_unpredictable', 'ransomware', 'ransomware_ransom']
+        elif vary == 'agent_collaboration' and steps is None:
+            steps = ['collaborative', 'uncollaborative']
+        if not steps:
+            steps = [risk_tolerance]
+
+        series = []
+        for i, step_value in enumerate(steps):
+            params = {
+                'scenario': scenario,
+                'agent_collaboration': agent_collaboration,
+                'risk_tolerance': risk_tolerance,
+                'num_years': num_years
+            }
+            params[vary] = step_value
+            label = str(step_value)
+            if vary == 'risk_tolerance':
+                label = f"{(float(step_value) * 100):.0f}%"
+            elif vary == 'agent_collaboration':
+                label = step_value
+
+            sim_results = load_simulation_for_scenario(
+                scenario=params['scenario'],
+                collaboration=params['agent_collaboration'],
+                risk_tolerance=float(params['risk_tolerance']),
+                years=int(params['num_years'])
+            )
+            summary = sim_results['summary']
+            series.append({
+                'x_value': step_value if vary != 'scenario' else i,
+                'x_label': label,
+                'final_profit': summary['final_profit'],
+                'final_risk': summary['final_risk'],
+                'avg_availability': summary['avg_availability'],
+                'label': label,
+                'parameters': params
+            })
+
+        return jsonify({
+            'success': True,
+            'vary': vary,
+            'series': series,
+            'count': len(series)
+        }), 200
+    except Exception as e:
+        logger.error(f"Error running sensitivity analysis: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 def get_agent_perspectives(scenario, collaboration, risk_tolerance):
     """Get perspectives from each agent based on scenario and parameters."""
     
@@ -551,6 +621,45 @@ def _calculate_agent_priority(agent, scenario_data, risk_tolerance):
     
     return agent_priorities.get(agent.name, 0.75) + random.uniform(-0.1, 0.1)
 
+
+def _investment_allocation_for_year(scenario, collaboration, risk_tolerance, year, years):
+    """
+    Compute bot investment strategy as % allocated to prevention, detection, response, recovery
+    for a given decision point (year). Deterministic from parameters for reproducibility.
+    """
+    # Base weights by scenario: high-threat scenarios shift toward prevention/detection
+    scenario_base = {
+        'simple_deterministic': (0.35, 0.30, 0.20, 0.15),
+        'simple_unpredictable': (0.30, 0.35, 0.20, 0.15),
+        'ransomware': (0.40, 0.30, 0.18, 0.12),
+        'ransomware_ransom': (0.35, 0.28, 0.22, 0.15),
+    }
+    p, d, r, rec = scenario_base.get(scenario, (0.33, 0.33, 0.20, 0.14))
+    # Risk-averse: more prevention/detection; risk-seeking: more spread, less prevention
+    p += (1 - risk_tolerance) * 0.15
+    d += (1 - risk_tolerance) * 0.05
+    r -= (1 - risk_tolerance) * 0.05
+    rec -= (1 - risk_tolerance) * 0.05
+    # Over time (later years): slightly more response/recovery as incidents accumulate
+    progress = year / max(years, 1)
+    r += progress * 0.08
+    rec += progress * 0.05
+    p -= progress * 0.06
+    d -= progress * 0.04
+    # Collaborative: more balanced; uncollaborative: more skewed to prevention
+    if collaboration != 'collaborative':
+        p += 0.08
+        d -= 0.03
+    # Normalize to sum to 1
+    total = p + d + r + rec
+    p, d, r, rec = p / total, d / total, r / total, rec / total
+    return {
+        'prevention_pct': round(p * 100, 1),
+        'detection_pct': round(d * 100, 1),
+        'response_pct': round(r * 100, 1),
+        'recovery_pct': round(rec * 100, 1),
+    }
+
 def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years):
     """Load simulation data for a specific scenario from CSV."""
     import pandas as pd
@@ -597,13 +706,15 @@ def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years)
         
         time_series = []
         for year in range(1, years + 1):
+            alloc = _investment_allocation_for_year(scenario, collaboration, risk_tolerance, year, years)
             profit_at_year = avg_profit * (year / years) * (0.8 + (year / years) * 0.4)
             time_series.append({
                 'year': year,
                 'accumulated_profit': max(0, profit_at_year),
                 'systems_at_risk': max(0, avg_risk * (1.5 - year / years)),
                 'compromised_systems': max(0, (avg_risk * (1.5 - year / years)) / 2),
-                'systems_availability': min(1.0, 0.92 + (year / years) * 0.06)
+                'systems_availability': min(1.0, 0.92 + (year / years) * 0.06),
+                **alloc
             })
         
         return {
@@ -643,6 +754,7 @@ def generate_mock_simulation_results(scenario, collaboration, risk_tolerance, ye
     
     time_series = []
     for year in range(1, years + 1):
+        alloc = _investment_allocation_for_year(scenario, collaboration, risk_tolerance, year, years)
         noise_profit = random.gauss(0, impact['profit_variance'] * profit_base)
         noise_risk = random.gauss(0, impact['risk_variance'] * risk_base)
         
@@ -651,7 +763,8 @@ def generate_mock_simulation_results(scenario, collaboration, risk_tolerance, ye
             'accumulated_profit': max(0, profit_base + noise_profit),
             'systems_at_risk': max(0, risk_base + noise_risk),
             'compromised_systems': max(0, (risk_base + noise_risk) / 2),
-            'systems_availability': min(1.0, 0.95 - (risk_base + noise_risk) / 200)
+            'systems_availability': min(1.0, 0.95 - (risk_base + noise_risk) / 200),
+            **alloc
         })
     
     return {

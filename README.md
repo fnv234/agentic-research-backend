@@ -69,7 +69,8 @@ Optional for full functionality:
 | Method | Endpoint       | Description |
 |--------|----------------|-------------|
 | `GET`  | `/api/scenarios` | List simulation scenarios (simple_deterministic, simple_unpredictable, ransomware, ransomware_ransom). |
-| `POST` | `/api/simulate`  | Run multi-agent simulation. Body: `scenario`, `agent_collaboration`, `risk_tolerance`, `num_years`. Returns time_series, summary, agent_perspectives. |
+| `POST` | `/api/simulate`  | Run multi-agent simulation. Body: `scenario`, `agent_collaboration`, `risk_tolerance`, `num_years`. Returns time_series (with per-year prevention_pct, detection_pct, response_pct, recovery_pct), summary, agent_perspectives. |
+| `POST` | `/api/sensitivity` | Sensitivity analysis: run many simulations varying one parameter. Body: `vary` (risk_tolerance \| scenario \| agent_collaboration), optional `steps`, plus fixed params. Returns `series` (x_label, final_profit, final_risk, avg_availability) for one graph. |
 
 ### Thresholds (MongoDB)
 
