@@ -352,7 +352,7 @@ def get_scenarios():
 def run_simulation():
     """Run a multi-agent simulation with specified parameters."""
     try:
-        data = request.json
+        data = request.json or {}
         scenario = data.get('scenario', 'simple_deterministic')
         agent_collaboration = data.get('agent_collaboration', 'collaborative')
         risk_tolerance = data.get('risk_tolerance', 0.5)
@@ -365,6 +365,17 @@ def run_simulation():
             years=num_years
         )
         
+        # Guarantee time_series has investment allocation on every row (for dashboard table)
+        ts = sim_results.get('time_series') or []
+        for i, row in enumerate(ts):
+            year_one = row.get('year', i + 1)
+            if row.get('prevention_pct') is None or row.get('detection_pct') is None:
+                alloc = _investment_allocation_for_year(
+                    scenario, agent_collaboration, risk_tolerance, year_one, len(ts) or 1
+                )
+                row.update(alloc)
+        sim_results['time_series'] = ts
+
         agent_perspectives = get_agent_perspectives(
             scenario=scenario,
             collaboration=agent_collaboration,
