@@ -29,7 +29,7 @@ app = Flask(__name__)
 
 CORS(app, resources={
     r"/*": {
-        "origins": os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,https://agentic-research-frontend.onrender.com").split(","),
+        "origins": [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173,https://agentic-research-frontend.onrender.com").split(",") if o.strip()],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type"]
     }
@@ -356,7 +356,7 @@ def run_simulation():
         scenario = data.get('scenario', 'simple_deterministic')
         agent_collaboration = data.get('agent_collaboration', 'collaborative')
         risk_tolerance = data.get('risk_tolerance', 0.5)
-        num_years = data.get('num_years', 5)
+        num_years = int(data.get('num_years', 5))
         
         sim_results = load_simulation_for_scenario(
             scenario=scenario,
@@ -404,8 +404,8 @@ def run_sensitivity_analysis():
         steps = data.get('steps')
         scenario = data.get('scenario', 'simple_deterministic')
         agent_collaboration = data.get('agent_collaboration', 'collaborative')
-        risk_tolerance = data.get('risk_tolerance', 0.5)
-        num_years = data.get('num_years', 5)
+        risk_tolerance = float(data.get('risk_tolerance', 0.5))
+        num_years = int(data.get('num_years', 5))
 
         if vary == 'risk_tolerance' and steps is None:
             steps = [0, 0.25, 0.5, 0.75, 1.0]
@@ -663,6 +663,9 @@ def _investment_allocation_for_year(scenario, collaboration, risk_tolerance, yea
 def load_simulation_for_scenario(scenario, collaboration, risk_tolerance, years):
     """Load simulation data for a specific scenario from CSV."""
     import pandas as pd
+
+    years = int(years) if years is not None else 5
+    risk_tolerance = float(risk_tolerance) if risk_tolerance is not None else 0.5
     
     csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'sim_data.csv')
     
